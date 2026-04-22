@@ -178,4 +178,4 @@ CORS_ALLOW_ALL_ORIGINS = True  # For development
 # TikTok API Settings
 TIKTOK_CLIENT_KEY = env('TIKTOK_CLIENT_KEY', default='')
 TIKTOK_CLIENT_SECRET = env('TIKTOK_CLIENT_SECRET', default='')
-TIKTOK_REDIRECT_URI = env('TIKTOK_REDIRECT_URI', default='http://localhost:8000/api/tiktok/callback/')
+TIKTOK_REDIRECT_URI = env('TIKTOK_REDIRECT_URI', default='')

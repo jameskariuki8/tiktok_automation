@@ -10,7 +10,7 @@ class TikTokApiService:
         self.account = account
         self.client_key = getattr(settings, 'TIKTOK_CLIENT_KEY', '')
         self.client_secret = getattr(settings, 'TIKTOK_CLIENT_SECRET', '')
-        self.redirect_uri = getattr(settings, 'TIKTOK_REDIRECT_URI', 'http://localhost:8000/api/tiktok/callback/')
+        self.redirect_uri = getattr(settings, 'TIKTOK_REDIRECT_URI', '')
 
     def get_auth_url(self, code_challenge=None):
         """
