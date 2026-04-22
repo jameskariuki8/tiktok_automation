@@ -11,18 +11,19 @@ class AnalyticsService:
         """
         Fetch current account info from TikTok and save to DB.
         """
-        # Placeholder for TikTok API call
-        # info = self.api_service.get_user_info()
+        user_info = self.api_service.get_user_info()
         
-        # Simulated data for now
+        if not user_info:
+            return False
+            
         today = timezone.now().date()
         AccountAnalytics.objects.update_or_create(
             account=self.account,
             date=today,
             defaults={
-                'follower_count': 12500,
-                'likes_count': 45000,
-                'video_count': 42
+                'follower_count': user_info.get('follower_count', 0),
+                'likes_count': user_info.get('likes_count', 0),
+                'video_count': user_info.get('video_count', 0)
             }
         )
         return True

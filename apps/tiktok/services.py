@@ -17,7 +17,7 @@ class TikTokApiService:
         Generate the TikTok OAuth authorization URL with PKCE.
         """
         import urllib.parse
-        scopes = "user.info.basic,user.info.profile,user.info.stats"
+        scopes = "user.info.basic,user.info.profile,user.info.stats,video.list"
         params = {
             'client_key': self.client_key,
             'scope': scopes,
@@ -64,6 +64,32 @@ class TikTokApiService:
                 }
             )
             return account
+        return None
+
+    def get_user_info(self):
+        """
+        Fetch profile and stats from TikTok User Info endpoint.
+        """
+        if not self.account:
+            return None
+            
+        url = f"{self.BASE_URL}/user/info/"
+        # TikTok v2 requires comma-separated fields in a 'fields' query param
+        params = {
+            'fields': 'display_name,avatar_url,bio_description,is_verified,follower_count,following_count,likes_count,video_count'
+        }
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}"
+        }
+        
+        response = requests.get(url, params=params, headers=headers)
+        if response.status_code == 200:
+            user_data = response.json().get('data', {}).get('user', {})
+            # Update the account model with latest info
+            self.account.display_name = user_data.get('display_name', self.account.display_name)
+            self.account.avatar_url = user_data.get('avatar_url', self.account.avatar_url)
+            self.account.save()
+            return user_data
         return None
 
     def upload_video(self, video_path, caption):
