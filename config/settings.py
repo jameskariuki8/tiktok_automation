@@ -26,7 +26,8 @@ DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://fnmyl-129-222-187-64.run.pinggy-free.link',
+    'https://tiktokautomation-production.up.railway.app',
+    
     'http://127.0.0.1:8000',
     'http://localhost:8000',
 ]
