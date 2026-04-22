@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required
 
 def home(request):
     if request.user.is_authenticated:
-        from apps.tiktok.models import TikTokAccount
-        from apps.analytics.models import AccountAnalytics
+        from tiktok.models import TikTokAccount
+        from analytics.models import AccountAnalytics
         
         account = TikTokAccount.objects.filter(user=request.user).first()
         analytics = None

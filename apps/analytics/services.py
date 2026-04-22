@@ -1,5 +1,5 @@
 from .models import AccountAnalytics, VideoAnalytics
-from apps.tiktok.services import TikTokApiService
+from tiktok.services import TikTokApiService
 from django.utils import timezone
 
 class AnalyticsService:

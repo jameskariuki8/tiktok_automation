@@ -50,7 +50,7 @@ class TikTokCallbackView(views.APIView):
         
         if account:
             # Trigger initial analytics fetch
-            from apps.analytics.services import AnalyticsService
+            from analytics.services import AnalyticsService
             analytics = AnalyticsService(account)
             analytics.fetch_and_store_account_metrics()
             
