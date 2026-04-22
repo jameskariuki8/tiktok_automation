@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}AI Content Optimizer - TikTok AI{% endblock %}
+{% block content %}
+<div class="glass p-8 rounded-3xl">
+    <h2 class="text-3xl font-bold mb-6">AI Content Strategy</h2>
+    <div class="max-w-2xl">
+        <label class="block text-sm font-medium mb-2">What is your video niche?</label>
+        <div class="flex space-x-2">
+            <input type="text" placeholder="e.g. AI Tutorials" class="flex-1 bg-dark/50 border border-white/10 rounded-xl px-4 py-2">
+            <button class="bg-gradient-to-tr from-primary to-secondary px-6 rounded-xl font-bold">Generate</button>
+        </div>
+    </div>
+    
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="space-y-4">
+            <h3 class="font-bold">Latest Ideas</h3>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">3 DIY AI hacks you need to know</div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">Why your AI scripts look like robots</div>
+        </div>
+        <div class="space-y-4">
+            <h3 class="font-bold">Optimal Times</h3>
+            <div class="p-4 bg-secondary/10 border border-secondary/20 rounded-xl">Today at 6:45 PM (High impact)</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,22 @@
+[project]
+name = "tiktok-automation"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "celery>=5.6.3",
+    "django>=5.2.13",
+    "django-cors-headers>=4.9.0",
+    "django-environ>=0.13.0",
+    "djangorestframework>=3.17.1",
+    "drf-spectacular>=0.29.0",
+    "faiss-cpu>=1.13.2",
+    "google-generativeai>=0.8.6",
+    "langchain>=1.2.15",
+    "langchain-community>=0.4.1",
+    "langchain-google-genai>=4.2.2",
+    "psycopg2-binary>=2.9.12",
+    "python-dotenv>=1.2.2",
+    "redis>=7.4.0",
+]

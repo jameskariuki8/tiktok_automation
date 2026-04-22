@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - TikTok AI{% endblock %}
+
+{% block content %}
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Quick Stats -->
+    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-3">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Welcome back, {{ user.username }}!</h2>
+            <div id="tiktok-status">
+                {% if not user.tiktok_accounts.all %}
+                    <a href="{% url 'tiktok-login' %}" class="bg-[#00f2ea] text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
+                        Connect TikTok
+                    </a>
+                {% else %}
+                    <span class="text-green-400 text-sm font-bold flex items-center gap-2">
+                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                        TikTok Connected
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Total Followers</p>
+                <p class="text-2xl font-bold">12.4K</p>
+                <p class="text-xs text-green-400">+2.4% this week</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Avg. Engagement</p>
+                <p class="text-2xl font-bold">8.2%</p>
+                <p class="text-xs text-green-400">+1.1% this week</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Scheduled Posts</p>
+                <p class="text-2xl font-bold">5</p>
+                <p class="text-xs text-secondary">Next in 2h</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">AI Credits</p>
+                <p class="text-2xl font-bold">{{ user.ai_credits }}</p>
+                <p class="text-xs opacity-50">Refills in 5 days</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Chart Placeholder -->
+    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-2 min-h-[300px] flex flex-col justify-between">
+        <div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold">Growth Overview</h3>
+                <select class="bg-dark/50 border border-white/10 rounded-lg text-xs px-2 py-1">
+                    <option>Last 30 Days</option>
+                    <option>Last 7 Days</option>
+                </select>
+            </div>
+            <div class="h-48 w-full bg-white/5 rounded-lg flex items-end p-4 space-x-2">
+                {% for i in "123456789012" %}
+                <div class="bg-gradient-to-t from-primary to-secondary w-full rounded-t-sm" style="height: {{ forloop.counter|add:20 }}%"></div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="flex justify-between text-[10px] opacity-40 px-2 mt-4">
+            <span>APR 10</span>
+            <span>APR 15</span>
+            <span>APR 20</span>
+            <span>APR 25</span>
+        </div>
+    </div>
+
+    <!-- Suggested Actions -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+        <h3 class="font-bold mb-4">AI Suggestions</h3>
+        <div class="space-y-4">
+            <div class="p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                <p class="text-xs font-bold text-primary mb-1">CONTENT IDEA</p>
+                <p class="text-sm">"Top 5 AI tools for marketing" is trending. Create a reaction video.</p>
+            </div>
+            <div class="p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
+                <p class="text-xs font-bold text-secondary mb-1">ENGAGEMENT</p>
+                <p class="text-sm">You have 12 unreplied comments. Use AI to generate quick replies?</p>
+            </div>
+            <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                <p class="text-xs font-bold opacity-50 mb-1">OPTIMIZATION</p>
+                <p class="text-sm">Your last video had low retention at 0:15. Try a shorter hook next time.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
