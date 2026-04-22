@@ -3,7 +3,18 @@ from django.contrib.auth.decorators import login_required
 
 def home(request):
     if request.user.is_authenticated:
-        return render(request, 'dashboard.html')
+        from apps.tiktok.models import TikTokAccount
+        from apps.analytics.models import AccountAnalytics
+        
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        analytics = None
+        if account:
+            analytics = AccountAnalytics.objects.filter(account=account).order_by('-date').first()
+            
+        return render(request, 'dashboard.html', {
+            'account': account,
+            'analytics': analytics
+        })
     return render(request, 'base.html')
 
 @login_required

@@ -49,6 +49,11 @@ class TikTokCallbackView(views.APIView):
         account = service.exchange_token(code, request.user, code_verifier=verifier)
         
         if account:
+            # Trigger initial analytics fetch
+            from apps.analytics.services import AnalyticsService
+            analytics = AnalyticsService(account)
+            analytics.fetch_and_store_account_metrics()
+            
             return redirect('/')
         return Response({'error': 'Failed to exchange token'}, status=status.HTTP_400_BAD_REQUEST)
 

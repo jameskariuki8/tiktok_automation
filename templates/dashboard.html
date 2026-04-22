@@ -25,18 +25,18 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div class="p-4 bg-white/5 rounded-xl border border-white/10">
                 <p class="text-sm opacity-60">Total Followers</p>
-                <p class="text-2xl font-bold">12.4K</p>
-                <p class="text-xs text-green-400">+2.4% this week</p>
+                <p class="text-2xl font-bold">{{ analytics.follower_count|default:"0" }}</p>
+                <p class="text-xs text-green-400">Live data</p>
             </div>
             <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">Avg. Engagement</p>
-                <p class="text-2xl font-bold">8.2%</p>
-                <p class="text-xs text-green-400">+1.1% this week</p>
+                <p class="text-sm opacity-60">Total Likes</p>
+                <p class="text-2xl font-bold">{{ analytics.likes_count|default:"0" }}</p>
+                <p class="text-xs text-green-400">Total reach</p>
             </div>
             <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">Scheduled Posts</p>
-                <p class="text-2xl font-bold">5</p>
-                <p class="text-xs text-secondary">Next in 2h</p>
+                <p class="text-sm opacity-60">Total Videos</p>
+                <p class="text-2xl font-bold">{{ analytics.video_count|default:"0" }}</p>
+                <p class="text-xs text-secondary">Content library</p>
             </div>
             <div class="p-4 bg-white/5 rounded-xl border border-white/10">
                 <p class="text-sm opacity-60">AI Credits</p>
