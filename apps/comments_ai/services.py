@@ -86,11 +86,36 @@ class CommentAIService:
             logger.error(f"RAG failed: {str(e)}")
             return self._direct_llm_reply(comment_text)
 
-    def _direct_llm_reply(self, comment_text):
+    def generate_dm_reply(self, message_text):
         """
-        Fallback when no context is available.
+        Generate a RAG-based reply for a Direct Message.
         """
-        prompt = ChatPromptTemplate.from_template("Generate a friendly, short TikTok reply to this comment: '{comment}'")
-        chain = prompt | self.llm
-        response = chain.invoke({"comment": comment_text})
-        return response.content
+        if not os.path.exists(self.vector_db_path):
+            return self._direct_llm_reply(message_text)
+
+        try:
+            vector_db = FAISS.load_local(self.vector_db_path, self.embeddings, allow_dangerous_deserialization=True)
+            docs = vector_db.similarity_search(message_text, k=3)
+            context = "\n".join([doc.page_content for doc in docs])
+            
+            prompt = ChatPromptTemplate.from_template("""
+            You are a professional assistant handling Direct Messages.
+            Use the context below to answer the user's question accurately.
+            Context: {context}
+            Message: {message}
+            Assistant Reply:""")
+            
+            chain = prompt | self.llm
+            response = chain.invoke({"context": context, "message": message_text})
+            return response.content
+        except:
+            return self._direct_llm_reply(message_text)
+
+    def ingest_local_kb(self):
+        """
+        Ingest the bundled knowledgebase.txt into the vector store.
+        """
+        kb_path = os.path.join(settings.BASE_DIR, 'apps', 'comments_ai', 'knowledgebase.txt')
+        if os.path.exists(kb_path):
+            return self.ingest_file(kb_path)
+        return False

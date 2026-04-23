@@ -48,25 +48,61 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- Post Comparison -->
+        <!-- AI Engagement Center -->
         <div class="glass p-6 rounded-2xl">
-            <h3 class="font-bold mb-6 flex items-center gap-2">
-                <svg class="w-5 h-5 text-primary" fill="currentColor" viewBox="0 0 20 20"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
-                Post Performance List
-            </h3>
-            <div class="space-y-4" id="post-list">
-                <!-- Data will be loaded here -->
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold">AI Engagement Center</h3>
+                <span class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">LIVE UNBOX</span>
+            </div>
+            <div class="space-y-4" id="recent-comments">
+                <!-- Sample Comment -->
+                <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
+                    <div class="flex justify-between items-start">
+                        <div class="flex gap-3">
+                            <div class="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center text-xs">UK</div>
+                            <div>
+                                <p class="text-xs font-bold">User_Kariuki</p>
+                                <p class="text-xs opacity-60">"How much do you charge for consulting?"</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] opacity-40">2m ago</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="generateAIReply(this, 'How much do you charge for consulting?')" class="text-[10px] bg-primary text-black font-bold px-3 py-1.5 rounded-lg hover:scale-105 transition-transform">AI Suggest Reply</button>
+                        <button class="text-[10px] border border-white/10 px-3 py-1.5 rounded-lg">Ignore</button>
+                    </div>
+                    <div class="ai-reply-box hidden mt-3 p-3 bg-secondary/10 border border-secondary/20 rounded-lg">
+                        <p class="text-[10px] font-bold text-secondary mb-1">RAG Response ✨</p>
+                        <p class="text-xs italic leading-relaxed" id="reply-text"></p>
+                        <button class="mt-2 text-[10px] bg-secondary text-black px-2 py-1 rounded">Send Reply</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- AI Deep Dive -->
-        <div class="glass p-6 rounded-2xl border-l-4 border-primary">
-            <h3 class="font-bold mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                AI Performance Advice
-            </h3>
-            <div id="ai-advice" class="text-sm opacity-80 leading-relaxed space-y-4">
-                <p>Connecting to analysis engine...</p>
+        <!-- AI Insights & Knowledge Base -->
+        <div class="space-y-6">
+            <div class="glass p-6 rounded-2xl border-l-4 border-secondary">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04c-.243.398-.382.866-.382 1.366 0 4.653 1.594 8.887 4.292 12.235A11.954 11.954 0 0012 21.056c1.572 0 3.037-.417 4.31-1.144 2.698-3.348 4.292-7.582 4.292-12.235 0-.5-.139-.968-.382-1.366-.382-1.366z"></path></svg>
+                    Knowledge Intelligence
+                </h3>
+                <p class="text-xs opacity-70 mb-4" id="kb-status">Analyzing knowledgebase.txt...</p>
+                <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
+                    <div class="bg-secondary h-full animate-pulse" style="width: 100%" id="kb-progress"></div>
+                </div>
+                <button onclick="retrainAI()" class="mt-4 text-[10px] uppercase font-bold text-secondary hover:underline transition-all">🔄 Retrain RAG Engine</button>
+            </div>
+
+            <!-- Deep Advice -->
+            <div class="glass p-6 rounded-2xl border-l-4 border-primary">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    AI Growth Advice
+                </h3>
+                <div id="ai-advice" class="text-xs opacity-60 leading-relaxed italic">
+                    Analyzing performance trend...
+                </div>
             </div>
         </div>
     </div>
@@ -88,14 +124,52 @@
         const adviceRes = await fetch('/api/content-ai/performance_advice/');
         const adviceData = await adviceRes.json();
         document.getElementById('ai-advice').innerHTML = adviceData.advice.replace(/\n/g, '<br>');
+        
+        document.getElementById('kb-status').innerText = 'RAG Engine Online (knowledgebase.txt Active)';
+        document.getElementById('kb-progress').classList.remove('animate-pulse');
     }
 
-    document.getElementById('refresh-btn').addEventListener('click', async () => {
-        const btn = document.getElementById('refresh-btn');
-        btn.classList.add('animate-spin');
-        // Logic to trigger sync...
-        setTimeout(() => btn.classList.remove('animate-spin'), 2000);
-    });
+    async function generateAIReply(btn, comment) {
+        const box = btn.closest('.p-4').querySelector('.ai-reply-box');
+        const text = box.querySelector('#reply-text');
+        
+        btn.innerText = 'AI Thinking...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/comments/suggest_reply/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ comment_text: comment })
+            });
+            const data = await response.json();
+            
+            text.innerText = data.suggested_reply;
+            box.classList.remove('hidden');
+        } catch (e) {
+            alert('AI failed to respond. Check knowledge base.');
+        } finally {
+            btn.innerText = 'AI Suggest Reply';
+            btn.disabled = false;
+        }
+    }
+
+    async function retrainAI() {
+        if(!confirm('Retrain AI on your latest knowledgebase.txt?')) return;
+        
+        const response = await fetch('/api/comments/ingest_data/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({ texts: ["Syncing local directory"] })
+        });
+        if(response.ok) alert('AI Knowledge Refreshed!');
+    }
 
     // Initialize Chart
     const ctx = document.getElementById('growthChart').getContext('2d');

@@ -16,14 +16,18 @@ class CommentSuggestionViewSet(viewsets.ModelViewSet):
     def ingest_data(self, request):
         """
         Endpoint to upload knowledge base text for RAG.
+        Also automatically syncs from apps/comments_ai/knowledgebase.txt
         """
-        texts = request.data.get('texts', [])
-        if not texts:
-            return Response({'error': 'No texts provided'}, status=status.HTTP_400_BAD_REQUEST)
-        
         service = CommentAIService(request.user)
-        service.ingest_knowledge(texts)
-        return Response({'status': 'Knowledge base updated successfully'})
+        # 1. Sync from local file
+        service.ingest_local_kb()
+        
+        # 2. Sync from request data if provided
+        texts = request.data.get('texts', [])
+        if texts and texts != ["Syncing local directory"]:
+            service.ingest_knowledge(texts)
+            
+        return Response({'status': 'Knowledge base synchronized from local file and input.'})
 
     @action(detail=False, methods=['post'])
     def suggest_reply(self, request):
