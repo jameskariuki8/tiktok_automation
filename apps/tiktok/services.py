@@ -201,8 +201,8 @@ class TikTokApiService:
             return []
             
         comment_fields = "id,text,reply_count,like_count,create_time,user"
-        # Removing trailing slash to prevent 404 on some TikTok v2 gateways
-        url = f"{self.BASE_URL}/video/comment/list?fields={comment_fields}"
+        # v2 Path: /comment/list (No 'video' prefix in some regions)
+        url = f"{self.BASE_URL}/comment/list?fields={comment_fields}"
         data = {
             'video_id': video_id,
             'cursor': cursor,
@@ -215,6 +215,12 @@ class TikTokApiService:
         
         try:
             response = requests.post(url, json=data, headers=headers)
+            
+            # Auto-fallback to Video Comment v1 if v2 is 404
+            if response.status_code == 404:
+                old_url = f"https://open.tiktokapis.com/video/comment/list/?fields={comment_fields}"
+                response = requests.post(old_url, json=data, headers=headers)
+
             if response.status_code == 200:
                 return response.json().get('data', {}).get('comments', [])
             else:

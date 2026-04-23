@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}Privacy Policy - Smart TikTok{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto glass p-10 rounded-3xl space-y-8">
+    <div class="text-center">
+        <h1 class="text-4xl font-bold mb-4 text-primary">Privacy Policy</h1>
+        <p class="opacity-50">Last Updated: April 23, 2026</p>
+    </div>
+
+    <section class="space-y-4">
+        <h2 class="text-2xl font-bold">1. Introduction</h2>
+        <p class="opacity-80 leading-relaxed text-sm">
+            Welcome to <strong>Smart TikTok</strong>. We respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and use our TikTok automation tools.
+        </p>
+    </section>
+
+    <section class="space-y-4">
+        <h2 class="text-2xl font-bold">2. Data We Collect</h2>
+        <p class="opacity-80 leading-relaxed text-sm">
+            Through the TikTok API, we collect and process the following information with your explicit consent:
+        </p>
+        <ul class="list-disc list-inside text-sm opacity-80 space-y-2 ml-4">
+            <li>TikTok username and profile information</li>
+            <li>Video statistics (likes, views, comments)</li>
+            <li>Direct message content (for AI reply automation only)</li>
+            <li>Public video content and metadata</li>
+        </ul>
+    </section>
+
+    <section class="space-y-4">
+        <h2 class="text-2xl font-bold">3. How We Use Your Data</h2>
+        <p class="opacity-80 leading-relaxed text-sm">
+            The data collected is used solely to:
+        </p>
+        <ul class="list-disc list-inside text-sm opacity-80 space-y-2 ml-4">
+            <li>Provide analytics and growth insights</li>
+            <li>Automate content scheduling as per your instructions</li>
+            <li>Generate AI-driven replies to engagement using our RAG engine</li>
+            <li>Improve the Smart TikTok user experience</li>
+        </ul>
+    </section>
+
+    <section class="space-y-4">
+        <h2 class="text-2xl font-bold">4. Data Sharing and Security</h2>
+        <p class="opacity-80 leading-relaxed text-sm">
+            We do not sell your personal data to third parties. We use industry-standard encryption to protect your data stored on our servers. Your TikTok access tokens are encrypted and handled securely.
+        </p>
+    </section>
+
+    <section class="space-y-4">
+        <h2 class="text-2xl font-bold">5. Contact Us</h2>
+        <p class="opacity-80 leading-relaxed text-sm">
+            If you have any questions about this privacy policy, please contact us at <span class="text-secondary">support@smart-tiktok.com</span>.
+        </p>
+    </section>
+</div>
+{% endblock %}

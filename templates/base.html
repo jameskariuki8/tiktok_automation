@@ -49,7 +49,7 @@
                 <div class="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center">
                     <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
                 </div>
-                <span class="text-xl font-bold tracking-tight">TikTok<span class="text-primary">AI</span></span>
+                <span class="text-xl font-bold tracking-tight">Smart<span class="text-primary">TikTok</span></span>
             </div>
             <div class="hidden md:flex space-x-8 text-sm font-medium">
                 <a href="{% url 'home' %}" class="hover:text-primary transition">Dashboard</a>
@@ -79,10 +79,10 @@
 
     <footer class="border-t border-white/10 py-8 px-6 mt-12">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center opacity-50 text-sm">
-            <p>&copy; 2026 TikTok AI Growth Assistant. All rights reserved.</p>
+            <p>&copy; 2026 Smart TikTok. All rights reserved.</p>
             <div class="flex space-x-6 mt-4 md:mt-0">
-                <a href="#">Terms</a>
-                <a href="#">Privacy</a>
+                <a href="{% url 'terms' %}" class="hover:text-primary transition">Terms</a>
+                <a href="{% url 'privacy-policy' %}" class="hover:text-primary transition">Privacy</a>
                 <a href="#">API docs</a>
             </div>
         </div>
