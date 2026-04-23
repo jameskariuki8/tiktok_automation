@@ -167,7 +167,7 @@ class TikTokApiService:
             "post_info": {
                 "title": caption[:80],
                 "description": caption,
-                "privacy_level": "PUBLIC_TO_EVERYONE"
+                "privacy_level": "SELF_ONLY"
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
