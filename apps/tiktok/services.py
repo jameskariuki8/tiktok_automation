@@ -101,7 +101,7 @@ class TikTokApiService:
             
         url = f"{self.BASE_URL}/video/list/"
         data = {
-            'fields': 'id,cover_image_url,share_url,video_description,duration,create_time,view_count,like_count,comment_count,share_count',
+            'fields': ["id", "cover_image_url", "share_url", "video_description", "duration", "create_time", "view_count", "like_count", "comment_count", "share_count"],
             'cursor': cursor,
             'max_count': max_count
         }
