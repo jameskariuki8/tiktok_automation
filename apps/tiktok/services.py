@@ -112,6 +112,9 @@ class TikTokApiService:
         response = requests.get(url, params=params, headers=headers)
         if response.status_code == 200:
             return response.json().get('data', {})
+        else:
+            print(f"TikTok API Video List Error: {response.text}")
+            return {"videos": [], "error": response.text}
         return None
 
     def sync_video_analytics(self):
