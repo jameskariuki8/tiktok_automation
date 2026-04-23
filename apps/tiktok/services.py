@@ -160,12 +160,11 @@ class TikTokApiService:
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=UTF-8'
         }
         
         init_data = {
             "post_info": {
-                "title": caption[:80],
                 "description": caption,
                 "privacy_level": "SELF_ONLY"
             },
