@@ -19,6 +19,8 @@ class TikTokAccount(models.Model):
     
     # Status
     is_active = models.BooleanField(default=True)
+    # Stealth Mode (For Scrapers/Bots)
+    stealth_token = models.TextField(null=True, blank=True, help_text="Paste your sessionid cookie here")
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

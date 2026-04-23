@@ -290,36 +290,60 @@ class TikTokApiService:
             print(f"Error fetching DMs: {e}")
         return []
 
+    def post_comment_reply_stealth(self, video_id, comment_id, text):
+        """
+        Stealth Bridge: Post a reply using the web-engine and sessionid cookie.
+        """
+        if not self.account or not self.account.stealth_token:
+            return False, "Stealth Mode: No stealth_token (cookie) found."
+            
+        url = "https://www.tiktok.com/api/comment/publish/"
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Cookie': f"sessionid={self.account.stealth_token}",
+            'Referer': f"https://www.tiktok.com/video/{video_id}",
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
+        
+        # Web parameters
+        data = {
+            'aweme_id': video_id,
+            'text': text,
+            'reply_id': comment_id,
+            'channel_id': '0',
+            'type': '1'
+        }
+        
+        try:
+            response = requests.post(url, data=data, headers=headers)
+            if response.status_code == 200 and '"status_code":0' in response.text:
+                return True, "Stealth Reply Posted! ✅"
+            return False, f"Stealth Error: {response.text}"
+        except Exception as e:
+            return False, f"Stealth Failed: {str(e)}"
+
     def post_comment_reply(self, video_id, comment_id, text):
         """
-        Post a reply to a specific comment on TikTok.
+        Hybrid Replier: Tries official API, defaults to Stealth Bridge.
         """
-        if not self.account:
-            return False, "No account connected"
+        # 1. Try Stealth Bridge first (Reliable)
+        if self.account and self.account.stealth_token:
+            success, msg = self.post_comment_reply_stealth(video_id, comment_id, text)
+            if success: return True, msg
             
-        # Try V2 Production Path
+        # 2. Fallback to Official API
+        if not self.account: return False, "No account connected"
+        
         url = f"{self.BASE_URL}/video/comment/reply/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
         }
-        data = {
-            'video_id': video_id,
-            'comment_id': comment_id,
-            'text': text
-        }
+        data = {'video_id': video_id, 'comment_id': comment_id, 'text': text}
         
         try:
             response = requests.post(url, json=data, headers=headers)
-            if response.status_code == 200:
-                return True, "Success"
-            
-            # Fallback to V1 Legacy Domain if V2 is restricted
-            v1_url = "https://open-api.tiktok.com/video/comment/reply/"
-            v1_response = requests.post(v1_url, json=data, headers=headers)
-            if v1_response.status_code == 200:
-                return True, "Success (v1)"
-                
-            return False, f"TikTok Error: {response.text}"
+            if response.status_code == 200: return True, "Success (Official API)"
+            return False, f"API Error: {response.text}"
         except Exception as e:
             return False, str(e)
