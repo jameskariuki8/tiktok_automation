@@ -10,15 +10,18 @@
             <h2 class="text-2xl font-bold">Welcome back, {{ user.username }}!</h2>
             <div id="tiktok-status">
                 {% if not user.tiktok_accounts.all %}
-                    <a href="{% url 'tiktok-login' %}" class="bg-[#00f2ea] text-black px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2">
+                    <a href="{% url 'tiktok-login' %}" class="bg-primary text-white hover:bg-opacity-80 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
                         Connect TikTok
                     </a>
                 {% else %}
-                    <span class="text-green-400 text-sm font-bold flex items-center gap-2">
-                        <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                        TikTok Connected
-                    </span>
+                    <div class="flex items-center gap-4">
+                        <span class="text-green-400 text-sm font-bold flex items-center gap-2">
+                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                            TikTok Connected
+                        </span>
+                        <a href="{% url 'tiktok-disconnect' %}" class="text-[10px] text-white/40 hover:text-red-400 uppercase font-bold tracking-widest transition">Disconnect</a>
+                    </div>
                 {% endif %}
             </div>
         </div>

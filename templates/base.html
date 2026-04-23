@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}TikTok Growth Assistant{% endblock %}</title>
+    <title>{% block title %}Smart TikTok{% endblock %}</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -39,53 +39,98 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
+        .mobile-menu-active {
+            transform: translateX(0) !important;
+        }
     </style>
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen bg-dark text-white">
+<body class="min-h-screen bg-dark text-white flex flex-col">
+    <!-- Navbar -->
     <nav class="border-b border-white/10 py-4 px-6 glass sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-2">
+            <!-- Logo -->
+            <div class="flex items-center space-x-2 z-50">
                 <div class="w-8 h-8 bg-gradient-to-tr from-primary to-secondary rounded-lg flex items-center justify-center">
                     <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
                 </div>
                 <span class="text-xl font-bold tracking-tight">Smart<span class="text-primary">TikTok</span></span>
             </div>
+
+            <!-- Desktop Links -->
             <div class="hidden md:flex space-x-8 text-sm font-medium">
                 <a href="{% url 'home' %}" class="hover:text-primary transition">Dashboard</a>
                 <a href="{% url 'scheduler-ui' %}" class="hover:text-primary transition">Scheduler</a>
                 <a href="{% url 'analytics-ui' %}" class="hover:text-primary transition">Analytics</a>
                 <a href="{% url 'content-ai-ui' %}" class="hover:text-primary transition">AI Content</a>
             </div>
+
+            <!-- Profile & Menu -->
             <div class="flex items-center space-x-4">
                 {% if user.is_authenticated %}
-                    <div class="flex items-center space-x-3">
-                        <span class="text-sm border border-white/20 px-2 py-1 rounded">{{ user.ai_credits }} Credits</span>
-                        <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center">
+                    <div class="hidden sm:flex items-center space-x-3">
+                        <span class="text-[10px] border border-white/20 px-2 py-1 rounded opacity-60 uppercase tracking-widest">{{ user.ai_credits }} Credits</span>
+                        <div class="w-8 h-8 rounded-full bg-primary/20 border border-primary/50 flex items-center justify-center text-xs font-bold text-primary">
                             {{ user.username|first|upper }}
                         </div>
                     </div>
                 {% else %}
-                    <a href="/admin/login/?next=/" class="text-sm font-medium">Login</a>
-                    <a href="/admin/login/?next=/" class="bg-primary hover:bg-opacity-80 px-4 py-2 rounded-full text-sm font-bold transition">Get Started</a>
+                    <a href="/admin/login/?next=/" class="hidden sm:block text-sm font-medium">Login</a>
+                {% endif %}
+                
+                <!-- Hamburger -->
+                <button id="mobile-menu-btn" class="md:hidden z-50 p-2 hover:bg-white/5 rounded-lg transition text-white">
+                    <svg id="menu-icon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Sidebar Overlay -->
+        <div id="mobile-menu" class="fixed inset-0 bg-dark z-40 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col p-10 pt-24 space-y-6">
+            <a href="{% url 'home' %}" class="text-2xl font-bold hover:text-primary transition">Dashboard</a>
+            <a href="{% url 'scheduler-ui' %}" class="text-2xl font-bold hover:text-primary transition">Scheduler</a>
+            <a href="{% url 'analytics-ui' %}" class="text-2xl font-bold hover:text-primary transition">Analytics</a>
+            <a href="{% url 'content-ai-ui' %}" class="text-2xl font-bold hover:text-primary transition">AI Content</a>
+            <div class="pt-10 border-t border-white/10">
+                {% if user.is_authenticated %}
+                    <p class="text-sm opacity-50 mb-4">Logged in as {{ user.username }}</p>
+                    <a href="/admin/logout/" class="text-red-400 font-bold">Logout</a>
+                {% else %}
+                    <a href="/admin/login/?next=/" class="bg-primary px-6 py-3 rounded-xl font-bold text-center">Login for Free</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto py-8 px-6">
+    <main class="flex-1 max-w-7xl mx-auto py-8 px-6 w-full">
         {% block content %}{% endblock %}
     </main>
 
     <footer class="border-t border-white/10 py-8 px-6 mt-12">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center opacity-50 text-sm">
-            <p>&copy; 2026 Smart TikTok. All rights reserved.</p>
-            <div class="flex space-x-6 mt-4 md:mt-0">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center opacity-50 text-sm gap-4">
+            <p>&copy; 2026 Smart TikTok. Professional Social Command Center.</p>
+            <div class="flex space-x-6">
                 <a href="{% url 'terms' %}" class="hover:text-primary transition">Terms</a>
                 <a href="{% url 'privacy-policy' %}" class="hover:text-primary transition">Privacy</a>
-                <a href="#">API docs</a>
+                <a href="#">Support</a>
             </div>
         </div>
     </footer>
+
+    <script>
+        const menuBtn = document.getElementById('mobile-menu-btn');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const menuIcon = document.getElementById('menu-icon');
+
+        menuBtn.addEventListener('click', () => {
+            const isActive = mobileMenu.classList.toggle('mobile-menu-active');
+            
+            if (isActive) {
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+            } else {
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>';
+            }
+        });
+    </script>
 </body>
 </html>
