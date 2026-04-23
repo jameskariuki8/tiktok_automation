@@ -11,17 +11,29 @@
 {% block content %}
 <div class="space-y-6">
     <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <header class="flex justify-between items-center mb-8">
         <div>
-            <h2 class="text-3xl font-bold">Social Command Center</h2>
-            <p class="opacity-60 text-sm">Manage entire TikTok presence from one view.</p>
+            <h1 class="text-3xl font-bold tracking-tight text-primary">Social Command Center</h1>
+            <p class="text-gray-400">Manage your TikTok presence with AI-powered stealth engagement.</p>
         </div>
-        <div class="flex gap-3">
-            <button onclick="loadVideos()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">🔄 Sync Videos</button>
-            <div class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
-                <span class="w-2 h-2 bg-primary rounded-full animate-ping"></span>
-                AI RAG Engine Live
+        <div class="flex gap-4">
+            <a href="/" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition">Home</a>
+        </div>
+    </header>
+
+    <!-- Stealth Mode Settings Bar -->
+    <div class="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+            <div class="p-2 bg-primary/20 rounded-lg">🕵️‍♂️</div>
+            <div>
+                <h3 class="text-sm font-bold text-primary">Stealth Bridge Mode</h3>
+                <p class="text-[10px] text-gray-400">Paste your sessionid to bypass TikTok API blocks.</p>
             </div>
+        </div>
+        <div class="flex-1 max-w-md flex gap-2">
+            <input type="password" id="stealth-token-input" placeholder="Paste sessionid here..." 
+                   class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-primary outline-none transition-all">
+            <button onclick="saveStealthToken()" class="px-6 py-2 bg-primary text-black font-bold rounded-xl text-xs hover:scale-105 active:scale-95 transition-all">Connect Bridge</button>
         </div>
     </div>
 
@@ -257,6 +269,35 @@
         } finally {
             btn.innerText = 'AI Auto-Reply';
             btn.disabled = false;
+        }
+    }
+
+    async function saveStealthToken() {
+        const input = document.getElementById('stealth-token-input');
+        const token = input.value.trim();
+        
+        if (!token) {
+            alert('Please paste a sessionid first!');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/tiktok/save-stealth-token/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ token: token })
+            });
+            const data = await response.json();
+            
+            if (response.ok) {
+                input.classList.add('border-primary');
+                input.classList.remove('border-white/10');
+                alert(data.status);
+            } else {
+                alert('Connection Failed: ' + data.error);
+            }
+        } catch (e) {
+            alert('Error connecting stealth bridge.');
         }
     }
 

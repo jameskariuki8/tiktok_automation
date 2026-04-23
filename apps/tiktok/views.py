@@ -93,3 +93,19 @@ class TikTokAccountListView(views.APIView):
         accounts = TikTokAccount.objects.filter(user=request.user)
         serializer = TikTokAccountSerializer(accounts, many=True)
         return Response(serializer.data)
+
+class TikTokSaveStealthTokenView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=400)
+            
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account:
+            return Response({'error': 'No TikTok account connected'}, status=404)
+            
+        account.stealth_token = token
+        account.save()
+        return Response({'status': 'Stealth Bridge Connected! ✅'})
