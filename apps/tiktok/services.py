@@ -200,7 +200,8 @@ class TikTokApiService:
         if not self.account:
             return []
             
-        url = f"{self.BASE_URL}/video/comment/list/"
+        comment_fields = "id,text,reply_count,like_count,create_time,user"
+        url = f"{self.BASE_URL}/video/comment/list/?fields={comment_fields}"
         data = {
             'video_id': video_id,
             'cursor': cursor,
@@ -215,6 +216,8 @@ class TikTokApiService:
             response = requests.post(url, json=data, headers=headers)
             if response.status_code == 200:
                 return response.json().get('data', {}).get('comments', [])
+            else:
+                print(f"Comment Fetch Error: {response.text}")
         except Exception as e:
             print(f"Error fetching comments: {e}")
         return []
