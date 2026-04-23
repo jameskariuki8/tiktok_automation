@@ -297,8 +297,8 @@ class TikTokApiService:
         if not self.account:
             return False, "No account connected"
             
-        # Try V2 first
-        url = f"{self.BASE_URL}/comment/reply/"
+        # Try V2 Production Path
+        url = f"{self.BASE_URL}/video/comment/reply/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
@@ -314,8 +314,8 @@ class TikTokApiService:
             if response.status_code == 200:
                 return True, "Success"
             
-            # Fallback to V1 if V2 is restricted
-            v1_url = "https://open.tiktokapis.com/video/comment/reply/"
+            # Fallback to V1 Legacy Domain if V2 is restricted
+            v1_url = "https://open-api.tiktok.com/video/comment/reply/"
             v1_response = requests.post(v1_url, json=data, headers=headers)
             if v1_response.status_code == 200:
                 return True, "Success (v1)"
