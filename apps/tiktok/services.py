@@ -99,7 +99,7 @@ class TikTokApiService:
         if not self.account:
             return None
             
-        fields_str = "id,video_description,create_time,cover_image_url,share_url,video_duration,view_count,like_count,comment_count,share_count"
+        fields_str = "id,video_description,create_time,cover_image_url,share_url,duration,view_count,like_count,comment_count,share_count"
         url = f"{self.BASE_URL}/video/list/?fields={fields_str}"
         
         data = {
