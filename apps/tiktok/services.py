@@ -297,12 +297,17 @@ class TikTokApiService:
         if not self.account or not self.account.stealth_token:
             return False, "Stealth Mode: No stealth_token (cookie) found."
             
-        url = "https://www.tiktok.com/api/comment/publish/"
+        # Use the raw stealth_token as the Cookie header (Support full cookies)
+        cookie_header = self.account.stealth_token
+        if "sessionid=" not in cookie_header.lower() and len(cookie_header) < 100:
+             cookie_header = f"sessionid={self.account.stealth_token}"
+             
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-            'Cookie': f"sessionid={self.account.stealth_token}",
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+            'Cookie': cookie_header,
             'Referer': f"https://www.tiktok.com/video/{video_id}",
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Origin': 'https://www.tiktok.com'
         }
         
         # Web parameters
