@@ -17,7 +17,7 @@ class TikTokApiService:
         Generate the TikTok OAuth authorization URL with PKCE.
         """
         import urllib.parse
-        scopes = "user.info.basic,user.info.profile,user.info.stats,video.list,video.upload"
+        scopes = "user.info.basic,user.info.profile,user.info.stats,video.list,video.publish"
         params = {
             'client_key': self.client_key,
             'scope': scopes,
