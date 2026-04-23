@@ -35,15 +35,6 @@ class TikTokLoginRedirectView(views.View):
         request.session['tiktok_code_verifier'] = verifier
         return redirect(service.get_auth_url(code_challenge=challenge))
 
-    @action(detail=False, methods=['post', 'get'])
-    def disconnect(self, request):
-        """
-        Disconnect the TikTok account from the user profile.
-        """
-        request.user.tiktok_accounts.all().delete()
-        from django.shortcuts import redirect
-        return redirect('home')
-
 class TikTokCallbackView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
