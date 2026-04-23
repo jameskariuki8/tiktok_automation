@@ -290,8 +290,9 @@
             const data = await response.json();
             
             if (response.ok) {
-                input.classList.add('border-primary');
                 input.classList.remove('border-white/10');
+                input.classList.add('border-primary', 'bg-primary/20', 'text-primary');
+                input.style.boxShadow = '0 0 15px rgba(0,255,153,0.3)';
                 alert(data.status);
             } else {
                 alert('Connection Failed: ' + data.error);

@@ -324,16 +324,23 @@ class TikTokApiService:
 
     def post_comment_reply(self, video_id, comment_id, text):
         """
-        Hybrid Replier: Tries official API, defaults to Stealth Bridge.
+        Hybrid Replier: Tries Stealth Bridge first, falls back to API only if no token.
         """
-        # 1. Try Stealth Bridge first (Reliable)
-        if self.account and self.account.stealth_token:
-            success, msg = self.post_comment_reply_stealth(video_id, comment_id, text)
-            if success: return True, msg
-            
-        # 2. Fallback to Official API
-        if not self.account: return False, "No account connected"
+        # Re-fetch account to ensure we have the latest stealth_token from the DB
+        from .models import TikTokAccount
+        self.account = TikTokAccount.objects.filter(id=self.account.id).first()
         
+        if self.account and self.account.stealth_token:
+            print(f"DEBUG: Using Stealth Bridge with token starting with {self.account.stealth_token[:5]}...")
+            success, msg = self.post_comment_reply_stealth(video_id, comment_id, text)
+            if success:
+                return True, msg
+            return False, f"Stealth Failed: {msg}"
+            
+        # 2. Fallback to Official API (Only if no Stealth Token)
+        if not self.account:
+            return False, "No account connected"
+            
         url = f"{self.BASE_URL}/video/comment/reply/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -343,7 +350,8 @@ class TikTokApiService:
         
         try:
             response = requests.post(url, json=data, headers=headers)
-            if response.status_code == 200: return True, "Success (Official API)"
-            return False, f"API Error: {response.text}"
+            if response.status_code == 200:
+                return True, "Success (Official API)"
+            return False, f"Official API restricted (404). Please ensure Stealth Token is set."
         except Exception as e:
             return False, str(e)
