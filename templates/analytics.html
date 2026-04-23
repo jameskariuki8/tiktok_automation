@@ -1,199 +1,219 @@
 {% extends 'base.html' %}
-{% block title %}Analytics - TikTok AI{% endblock %}
+{% block title %}Social Command Center - TikTok AI{% endblock %}
+
+{% block extra_head %}
+<style>
+    .active-card { border-color: #ff0050 !important; background: rgba(255, 0, 80, 0.05) !important; }
+    .scroll-hide::-webkit-scrollbar { display: none; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="space-y-8">
+<div class="space-y-6">
     <!-- Header -->
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h2 class="text-3xl font-bold">Performance Analytics</h2>
-            <p class="opacity-60 text-sm">Real-time data from your TikTok accounts.</p>
+            <h2 class="text-3xl font-bold">Social Command Center</h2>
+            <p class="opacity-60 text-sm">Manage entire TikTok presence from one view.</p>
         </div>
-        <button id="refresh-btn" class="p-2 hover:bg-white/10 rounded-full transition-colors" title="Refresh Data">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-        </button>
-    </div>
-
-    <!-- KPI Overlays -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="glass p-6 rounded-2xl border-b-4 border-primary">
-            <p class="text-xs font-bold opacity-50 uppercase mb-2">Total Impressions</p>
-            <h3 class="text-3xl font-bold" id="total-views">0</h3>
-            <p class="text-xs text-green-400 mt-2">↑ Data synced live</p>
-        </div>
-        <div class="glass p-6 rounded-2xl border-b-4 border-secondary">
-            <p class="text-xs font-bold opacity-50 uppercase mb-2">Total Engagement</p>
-            <h3 class="text-3xl font-bold" id="total-likes">0</h3>
-            <p class="text-xs opacity-40 mt-2">Sum of likes & comments</p>
-        </div>
-        <div class="glass p-6 rounded-2xl border-b-4 border-white/20">
-            <p class="text-xs font-bold opacity-50 uppercase mb-2">Completion Rate</p>
-            <h3 class="text-3xl font-bold">-- %</h3>
-            <p class="text-xs opacity-40 mt-2">Calculated by AI</p>
-        </div>
-    </div>
-
-    <!-- Main Chart -->
-    <div class="glass p-8 rounded-3xl">
-        <div class="flex justify-between items-center mb-8">
-            <h3 class="font-bold">Follower Growth Trend</h3>
-            <div class="flex gap-2">
-                <button class="text-xs bg-white/10 px-3 py-1 rounded-lg">7D</button>
-                <button class="text-xs opacity-40 px-3 py-1 rounded-lg">30D</button>
+        <div class="flex gap-3">
+            <button onclick="location.reload()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">🔄 Refresh All</button>
+            <div class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+                <span class="w-2 h-2 bg-primary rounded-full animate-ping"></span>
+                AI RAG Engine Live
             </div>
         </div>
-        <div class="h-64 flex items-center justify-center bg-white/5 rounded-2xl border border-white/5">
-             <canvas id="growthChart"></canvas>
-        </div>
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <!-- AI Engagement Center -->
-        <div class="glass p-6 rounded-2xl">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold">AI Engagement Center</h3>
-                <span class="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">LIVE UNBOX</span>
+    <!-- Main 3-Pane Layout -->
+    <div class="grid grid-cols-12 gap-6 h-[800px]">
+        
+        <!-- PANE 1: Video Navigator (3 Columns) -->
+        <div class="col-span-12 lg:col-span-3 glass rounded-3xl p-6 flex flex-col space-y-4">
+            <h3 class="font-bold flex items-center gap-2 text-sm uppercase opacity-50">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                Your Videos
+            </h3>
+            <div id="video-list" class="flex-1 overflow-y-auto space-y-3 pr-2 scroll-hide">
+                <!-- Loading State -->
+                <div class="p-4 text-center opacity-30 text-xs">Fetching videos...</div>
             </div>
-            <div class="space-y-4" id="recent-comments">
-                <!-- Sample Comment -->
-                <div class="p-4 bg-white/5 border border-white/10 rounded-xl space-y-3">
-                    <div class="flex justify-between items-start">
-                        <div class="flex gap-3">
-                            <div class="w-8 h-8 bg-secondary/20 rounded-full flex items-center justify-center text-xs">UK</div>
-                            <div>
-                                <p class="text-xs font-bold">User_Kariuki</p>
-                                <p class="text-xs opacity-60">"How much do you charge for consulting?"</p>
-                            </div>
-                        </div>
-                        <span class="text-[10px] opacity-40">2m ago</span>
+        </div>
+
+        <!-- PANE 2: Focused Analysis & Comments (6 Columns) -->
+        <div class="col-span-12 lg:col-span-6 flex flex-col space-y-6">
+            
+            <!-- Video Specific Stats -->
+            <div class="glass rounded-3xl p-6">
+                <div id="selected-video-header" class="flex items-center gap-4 mb-6">
+                    <div class="w-20 h-28 bg-dark rounded-xl flex-shrink-0 animate-pulse"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 bg-white/10 w-3/4 rounded animate-pulse"></div>
+                        <div class="h-3 bg-white/5 w-1/2 rounded animate-pulse"></div>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="generateAIReply(this, 'How much do you charge for consulting?')" class="text-[10px] bg-primary text-black font-bold px-3 py-1.5 rounded-lg hover:scale-105 transition-transform">AI Suggest Reply</button>
-                        <button class="text-[10px] border border-white/10 px-3 py-1.5 rounded-lg">Ignore</button>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                        <p class="text-[10px] opacity-50 uppercase mb-1">Views</p>
+                        <p class="text-xl font-bold" id="v-views">--</p>
                     </div>
-                    <div class="ai-reply-box hidden mt-3 p-3 bg-secondary/10 border border-secondary/20 rounded-lg">
-                        <p class="text-[10px] font-bold text-secondary mb-1">RAG Response ✨</p>
-                        <p class="text-xs italic leading-relaxed" id="reply-text"></p>
-                        <button class="mt-2 text-[10px] bg-secondary text-black px-2 py-1 rounded">Send Reply</button>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                        <p class="text-[10px] opacity-50 uppercase mb-1">Likes</p>
+                        <p class="text-xl font-bold" id="v-likes">--</p>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5 text-center">
+                        <p class="text-[10px] opacity-50 uppercase mb-1">Comments</p>
+                        <p class="text-xl font-bold" id="v-comments">--</p>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- AI Insights & Knowledge Base -->
-        <div class="space-y-6">
-            <div class="glass p-6 rounded-2xl border-l-4 border-secondary">
-                <h3 class="font-bold mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04c-.243.398-.382.866-.382 1.366 0 4.653 1.594 8.887 4.292 12.235A11.954 11.954 0 0012 21.056c1.572 0 3.037-.417 4.31-1.144 2.698-3.348 4.292-7.582 4.292-12.235 0-.5-.139-.968-.382-1.366-.382-1.366z"></path></svg>
-                    Knowledge Intelligence
+            <!-- Contextual Comments Feed -->
+            <div class="glass rounded-3xl p-6 flex-1 flex flex-col space-y-4">
+                <h3 class="font-bold flex items-center gap-2 text-sm uppercase opacity-50">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    Video Comments
                 </h3>
-                <p class="text-xs opacity-70 mb-4" id="kb-status">Analyzing knowledgebase.txt...</p>
-                <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
-                    <div class="bg-secondary h-full animate-pulse" style="width: 100%" id="kb-progress"></div>
-                </div>
-                <button onclick="retrainAI()" class="mt-4 text-[10px] uppercase font-bold text-secondary hover:underline transition-all">🔄 Retrain RAG Engine</button>
-            </div>
-
-            <!-- Deep Advice -->
-            <div class="glass p-6 rounded-2xl border-l-4 border-primary">
-                <h3 class="font-bold mb-4 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    AI Growth Advice
-                </h3>
-                <div id="ai-advice" class="text-xs opacity-60 leading-relaxed italic">
-                    Analyzing performance trend...
+                <div id="video-comments-list" class="flex-1 overflow-y-auto space-y-4 pr-2 scroll-hide">
+                    <div class="p-8 text-center opacity-30 text-xs">Select a video to view comments</div>
                 </div>
             </div>
         </div>
+
+        <!-- PANE 3: Inbox (DMs) (3 Columns) -->
+        <div class="col-span-12 lg:col-span-3 glass rounded-3xl p-6 flex flex-col space-y-4 border-l border-white/10">
+            <h3 class="font-bold flex items-center gap-2 text-sm uppercase opacity-50">
+                <svg class="w-4 h-4 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Direct Messages
+            </h3>
+            <div id="inbox-list" class="flex-1 overflow-y-auto space-y-3 pr-2 scroll-hide">
+                <!-- Data fetched via TikTok IM API -->
+                <div class="p-8 text-center opacity-30 text-xs">No active conversations</div>
+            </div>
+        </div>
+
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    async function loadData() {
-        const response = await fetch('/api/analytics/overview/');
-        const data = await response.json();
-        
-        if (data.length > 0) {
-            const stats = data[0];
-            document.getElementById('total-views').innerText = stats.video_count || '--';
-            document.getElementById('total-likes').innerText = stats.likes_count || '0';
-        }
+    let currentVideoId = null;
 
-        // Fetch AI advice
-        const adviceRes = await fetch('/api/content-ai/performance_advice/');
-        const adviceData = await adviceRes.json();
-        document.getElementById('ai-advice').innerHTML = adviceData.advice.replace(/\n/g, '<br>');
+    async function loadVideos() {
+        const response = await fetch('/api/analytics/video_list/');
+        const videos = await response.json();
+        const container = document.getElementById('video-list');
         
-        document.getElementById('kb-status').innerText = 'RAG Engine Online (knowledgebase.txt Active)';
-        document.getElementById('kb-progress').classList.remove('animate-pulse');
+        container.innerHTML = videos.map(v => `
+            <div onclick="selectVideo('${v.id}', '${v.view_count}', '${v.like_count}', '${v.comment_count}', '${v.video_description}', '${v.cover_image_url}')" 
+                 class="p-3 bg-white/5 border border-white/5 rounded-xl cursor-pointer hover:border-primary/50 transition-all group flex gap-3">
+                <img src="${v.cover_image_url}" class="w-12 h-16 rounded-md object-cover">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-medium truncate">${v.video_description || 'Untitled Post'}</p>
+                    <p class="text-[10px] opacity-40 mt-1">${v.view_count} views</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function selectVideo(id, views, likes, comments, desc, img) {
+        currentVideoId = id;
+        
+        // Update header
+        document.getElementById('selected-video-header').innerHTML = `
+            <img src="${img}" class="w-20 h-28 rounded-xl object-cover">
+            <div class="flex-1">
+                <p class="font-bold text-lg">${desc.substring(0, 50)}${desc.length > 50 ? '...' : ''}</p>
+                <p class="text-xs opacity-50">ID: ${id}</p>
+            </div>
+        `;
+        
+        document.getElementById('v-views').innerText = views;
+        document.getElementById('v-likes').innerText = likes;
+        document.getElementById('v-comments').innerText = comments;
+
+        // Load Comments
+        loadComments(id);
+    }
+
+    async function loadComments(videoId) {
+        const container = document.getElementById('video-comments-list');
+        container.innerHTML = '<div class="p-8 text-center opacity-30 text-xs translate-y-4">Consulting TikTok API...</div>';
+
+        try {
+            const response = await fetch(\`/api/analytics/video_comments/?video_id=\${videoId}\`);
+            const comments = await response.json();
+            
+            if(!comments.length) {
+                container.innerHTML = '<div class="p-8 text-center opacity-30 text-xs">No comments yet on this post.</div>';
+                return;
+            }
+
+            container.innerHTML = comments.map(c => `
+                <div class="p-4 bg-white/5 border border-white/5 rounded-2xl animate-in fade-in slide-in-from-top-2">
+                    <div class="flex justify-between items-start mb-2">
+                        <p class="text-xs font-bold text-secondary">@${c.user.display_name}</p>
+                        <span class="text-[10px] opacity-40">${new Date(c.create_time * 1000).toLocaleDateString()}</span>
+                    </div>
+                    <p class="text-xs italic mb-3 opacity-80 leading-relaxed">"${c.text}"</p>
+                    <div class="flex gap-2">
+                        <button onclick="generateAIReply(this, '${c.text.replace(/'/g, "\\'")}')" class="text-[10px] bg-primary text-black font-bold px-3 py-1 rounded-lg hover:scale-105 transition">AI Suggest Reply</button>
+                    </div>
+                    <div class="ai-reply-box hidden mt-3 p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
+                         <p class="text-[10px] font-bold text-secondary mb-1">RAG Response</p>
+                         <p class="text-xs italic" id="reply-text"></p>
+                         <button class="mt-2 text-[10px] bg-secondary text-black px-2 py-1 rounded">Post Reply</button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            container.innerHTML = '<div class="p-8 text-center text-red-400 text-xs">Failed to fetch comments. Connection error.</div>';
+        }
+    }
+
+    async function loadInbox() {
+        const container = document.getElementById('inbox-list');
+        try {
+            const response = await fetch('/api/analytics/inbox/');
+            const dms = await response.json();
+            
+            if(!dms.length) {
+                 container.innerHTML = '<div class="p-8 text-center opacity-30 text-xs">Your inbox is empty.</div>';
+                 return;
+            }
+
+            container.innerHTML = dms.map(dm => `
+                <div class="p-3 bg-secondary/5 border border-secondary/10 rounded-xl space-y-2">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 bg-secondary/20 rounded-full flex items-center justify-center text-[10px] font-bold">U</div>
+                        <p class="text-[10px] font-bold truncate">${dm.display_name}</p>
+                    </div>
+                    <p class="text-[10px] opacity-60 italic truncate">"${dm.latest_message || 'New Message'}"</p>
+                    <button onclick="generateDMReply(this, '${dm.latest_message || ''}')" class="w-full py-1 bg-secondary/10 text-secondary border border-secondary/20 text-[10px] rounded hover:bg-secondary/20 transition">AI Reply</button>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error('Inbox failed', e);
+        }
     }
 
     async function generateAIReply(btn, comment) {
         const box = btn.closest('.p-4').querySelector('.ai-reply-box');
         const text = box.querySelector('#reply-text');
-        
         btn.innerText = 'AI Thinking...';
-        btn.disabled = true;
-
-        try {
-            const response = await fetch('/api/comments/suggest_reply/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                body: JSON.stringify({ comment_text: comment })
-            });
-            const data = await response.json();
-            
-            text.innerText = data.suggested_reply;
-            box.classList.remove('hidden');
-        } catch (e) {
-            alert('AI failed to respond. Check knowledge base.');
-        } finally {
-            btn.innerText = 'AI Suggest Reply';
-            btn.disabled = false;
-        }
-    }
-
-    async function retrainAI() {
-        if(!confirm('Retrain AI on your latest knowledgebase.txt?')) return;
         
-        const response = await fetch('/api/comments/ingest_data/', {
+        const response = await fetch('/api/comments/suggest_reply/', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            body: JSON.stringify({ texts: ["Syncing local directory"] })
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+            body: JSON.stringify({ comment_text: comment })
         });
-        if(response.ok) alert('AI Knowledge Refreshed!');
+        const data = await response.json();
+        text.innerText = data.suggested_reply;
+        box.classList.remove('hidden');
+        btn.innerText = 'AI Suggest Reply';
     }
 
-    // Initialize Chart
-    const ctx = document.getElementById('growthChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-          labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-          datasets: [{
-            label: 'Followers',
-            data: [110, 112, 113, 115, 118, 120, 125],
-            borderColor: '#00f2ea',
-            backgroundColor: 'rgba(0, 242, 234, 0.1)',
-            fill: true,
-            tension: 0.4
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
-          scales: { y: { display: false }, x: { grid: { display: false } } }
-        }
-    });
-
-    loadData();
+    // Initialize
+    loadVideos();
+    loadInbox();
 </script>
 {% endblock %}

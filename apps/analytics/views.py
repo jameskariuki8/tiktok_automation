@@ -46,3 +46,40 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         stats = AccountAnalytics.objects.filter(account=account).order_by('date')
         serializer = AccountAnalyticsSerializer(stats, many=True)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def video_comments(self, request):
+        video_id = request.query_params.get('video_id')
+        if not video_id:
+            return Response({'error': 'video_id is required'}, status=400)
+            
+        from tiktok.services import TikTokApiService
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account:
+            return Response({'error': 'No TikTok account connected'}, status=400)
+            
+        service = TikTokApiService(account)
+        comments = service.fetch_comments(video_id)
+        return Response(comments)
+
+    @action(detail=False, methods=['get'])
+    def inbox(self, request):
+        from tiktok.services import TikTokApiService
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account:
+            return Response({'error': 'No TikTok account connected'}, status=400)
+            
+        service = TikTokApiService(account)
+        messages = service.get_direct_messages()
+        return Response(messages)
+
+    @action(detail=False, methods=['get'])
+    def video_list(self, request):
+        from tiktok.services import TikTokApiService
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account:
+            return Response({'error': 'No TikTok account connected'}, status=400)
+        
+        service = TikTokApiService(account)
+        data = service.get_video_list()
+        return Response(data.get('videos', []) if data else [])

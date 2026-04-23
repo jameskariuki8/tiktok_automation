@@ -189,16 +189,48 @@ class TikTokApiService:
             
         return {"status": "error", "message": f"TikTok rejected upload: {error_msg}"}
 
-    def fetch_comments(self, video_id):
+    def fetch_comments(self, video_id, cursor=0, max_count=20):
         """
-        Fetch comments for a specific video.
+        Fetch comments for a specific video using TikTok v2 API.
         """
-        # API call to fetch comments
+        if not self.account:
+            return []
+            
+        url = f"{self.BASE_URL}/video/comment/list/"
+        params = {
+            'video_id': video_id,
+            'cursor': cursor,
+            'max_count': max_count
+        }
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}"
+        }
+        
+        try:
+            response = requests.get(url, params=params, headers=headers)
+            if response.status_code == 200:
+                return response.json().get('data', {}).get('comments', [])
+        except Exception as e:
+            print(f"Error fetching comments: {e}")
         return []
 
-    def send_dm(self, recipient_id, text):
+    def get_direct_messages(self, cursor=0, max_count=20):
         """
-        Send a direct message.
+        Fetch conversation list for the account (DMs).
         """
-        # API call to send DM
-        return True
+        if not self.account:
+            return []
+            
+        # TikTok v2 DM API endpoint
+        url = f"{self.BASE_URL}/im/conversation/list/"
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}"
+        }
+        
+        try:
+            response = requests.get(url, headers=headers)
+            if response.status_code == 200:
+                return response.json().get('data', {}).get('conversations', [])
+        except Exception as e:
+            print(f"Error fetching DMs: {e}")
+        return []
