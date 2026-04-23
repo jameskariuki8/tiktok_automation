@@ -1,13 +1,176 @@
 {% extends 'base.html' %}
 {% block title %}Scheduler - TikTok AI{% endblock %}
+
 {% block content %}
-<div class="glass p-8 rounded-3xl">
-    <h2 class="text-3xl font-bold mb-6">Post Scheduler</h2>
-    <p class="opacity-70 mb-8">Schedule your videos and let the AI handle the rest.</p>
-    <div class="border-2 border-dashed border-white/10 p-12 rounded-2xl flex flex-col items-center justify-center text-center">
-        <svg class="w-12 h-12 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-        <p class="text-lg font-medium">Upload a video to get started</p>
-        <button class="mt-4 bg-primary px-6 py-2 rounded-full font-bold">New Post</button>
+<div class="space-y-8">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <h2 class="text-3xl font-bold">Content Scheduler</h2>
+            <p class="opacity-60 text-sm">Plan, optimize, and automate your TikTok presence.</p>
+        </div>
+        <button onclick="document.getElementById('new-post-modal').classList.remove('hidden')" class="bg-primary text-black px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+            Create New Post
+        </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Calendar/Queue List -->
+        <div class="lg:col-span-2 space-y-6">
+            <div class="glass p-6 rounded-2xl">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    Upcoming Queue
+                </h3>
+                <div class="space-y-4" id="scheduled-posts-list">
+                    <!-- Sample Item -->
+                    <div class="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center gap-4 group hover:border-primary/50 transition-colors">
+                        <div class="w-16 h-24 bg-dark rounded-lg overflow-hidden relative">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/40">
+                                <svg class="w-6 h-6 text-white opacity-60" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                            </div>
+                        </div>
+                        <div class="flex-1">
+                            <p class="font-medium text-sm truncate max-w-[200px]">Product Demo - New Features...</p>
+                            <p class="text-xs opacity-50 mt-1">Tomorrow at 6:00 PM</p>
+                            <div class="flex gap-2 mt-2">
+                                <span class="text-[10px] bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">AI Optimized</span>
+                                <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Ready</span>
+                            </div>
+                        </div>
+                        <button class="p-2 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Sidebar -->
+        <div class="space-y-6">
+            <div class="glass p-6 rounded-2xl border-l-4 border-secondary">
+                <h3 class="font-bold mb-4 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-secondary" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"></path></svg>
+                    Smart Posting Insight
+                </h3>
+                <p class="text-xs opacity-70 leading-relaxed">
+                    Based on your target audience in the <strong>Entertainment</strong> niche, your best posting time is <strong>Tuesdays at 7:45 PM</strong>. 
+                </p>
+                <div class="mt-4 p-3 bg-secondary/5 rounded-xl border border-secondary/10">
+                    <p class="text-[10px] font-bold text-secondary mb-1">PRO TIP</p>
+                    <p class="text-xs">Using 3-4 hashtags is performing 15% better than using 10+ tags this week.</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
+<!-- New Post Modal -->
+<div id="new-post-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="glass w-full max-w-xl p-8 rounded-3xl space-y-6 relative border border-white/10 shadow-2xl">
+        <button onclick="document.getElementById('new-post-modal').classList.add('hidden')" class="absolute top-6 right-6 opacity-40 hover:opacity-100">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        <h3 class="text-2xl font-bold">Create New Post</h3>
+        
+        <form class="space-y-4" id="post-form" enctype="multipart/form-data">
+            <div>
+                <label class="block text-xs font-bold opacity-50 mb-2 uppercase">Video File</label>
+                <div class="border-2 border-dashed border-white/10 rounded-2xl p-8 text-center hover:border-primary transition-colors cursor-pointer" onclick="document.getElementById('video_file').click()">
+                    <p class="text-sm opacity-60" id="file-label">Click to upload Video or Picture</p>
+                    <input type="file" id="video_file" name="video_file" class="hidden" accept="video/*,image/*" required onchange="document.getElementById('file-label').innerText = this.files[0].name">
+                </div>
+            </div>
+
+            <div class="flex gap-4">
+               <div class="flex-1">
+                   <label class="block text-xs font-bold opacity-50 mb-2 uppercase">Topic / Context</label>
+                   <input type="text" id="topic" placeholder="e.g. Morning routine vlog" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none text-sm transition-colors">
+               </div>
+               <button type="button" id="ai-suggest-btn" class="mt-6 bg-secondary/20 text-secondary px-4 rounded-xl hover:bg-secondary/30 transition-colors text-xs font-bold">
+                   AI Generate
+               </button>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold opacity-50 mb-2 uppercase">Caption & Hashtags</label>
+                <textarea id="caption" name="caption" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 h-32 focus:border-primary outline-none text-sm transition-colors" placeholder="Write your hook here..." required></textarea>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold opacity-50 mb-2 uppercase">Date & Time</label>
+                    <input type="datetime-local" name="scheduled_time" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:border-primary outline-none text-sm transition-colors" required>
+                </div>
+                <div class="flex items-end">
+                    <button type="submit" id="submit-btn" class="w-full bg-primary text-black font-bold py-3 rounded-xl hover:scale-105 transition-transform shadow-lg shadow-primary/20">
+                        Schedule Post
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.getElementById('ai-suggest-btn').addEventListener('click', async () => {
+        const topic = document.getElementById('topic').value;
+        if(!topic) return alert('Please enter a topic for the AI to analyze!');
+        
+        const btn = document.getElementById('ai-suggest-btn');
+        const originalText = btn.innerText;
+        btn.innerText = 'Analyzing...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/content-ai/generate-caption/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ topic: topic })
+            });
+            const data = await response.json();
+            document.getElementById('caption').value = data.caption;
+        } catch (e) {
+            console.error(e);
+            alert('AI generation failed. Please try again.');
+        } finally {
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    });
+
+    document.getElementById('post-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('submit-btn');
+        btn.innerText = 'Creating...';
+        btn.disabled = true;
+
+        const formData = new FormData(e.target);
+        
+        try {
+            const response = await fetch('/api/scheduler/posts/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: formData
+            });
+            
+            if(response.ok) {
+                location.reload();
+            } else {
+                alert('Scheduling failed. Check your data.');
+            }
+        } catch (e) {
+            console.error(e);
+        } finally {
+            btn.innerText = 'Schedule Post';
+            btn.disabled = false;
+        }
+    });
+</script>
 {% endblock %}

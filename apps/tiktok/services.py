@@ -92,6 +92,56 @@ class TikTokApiService:
             return user_data
         return None
 
+    def get_video_list(self, cursor=0, max_count=20):
+        """
+        Fetch the list of videos posted by the user.
+        """
+        if not self.account:
+            return None
+            
+        url = f"{self.BASE_URL}/video/list/"
+        params = {
+            'fields': 'id,cover_image_url,share_url,video_description,duration,create_time,view_count,like_count,comment_count,share_count',
+            'cursor': cursor,
+            'max_count': max_count
+        }
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}"
+        }
+        
+        response = requests.get(url, params=params, headers=headers)
+        if response.status_code == 200:
+            return response.json().get('data', {})
+        return None
+
+    def sync_video_analytics(self):
+        """
+        Sync metrics for all recent videos.
+        """
+        from analytics.models import VideoAnalytics
+        from django.utils import timezone
+        
+        data = self.get_video_list()
+        if not data:
+            return False
+            
+        videos = data.get('videos', [])
+        today = timezone.now().date()
+        
+        for v in videos:
+            VideoAnalytics.objects.update_or_create(
+                tiktok_video_id=v['id'],
+                date=today,
+                defaults={
+                    'account': self.account,
+                    'view_count': v.get('view_count', 0),
+                    'like_count': v.get('like_count', 0),
+                    'comment_count': v.get('comment_count', 0),
+                    'share_count': v.get('share_count', 0),
+                }
+            )
+        return True
+
     def upload_video(self, video_path, caption):
         """
         Upload and publish a video to TikTok.

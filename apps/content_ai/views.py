@@ -19,6 +19,15 @@ class ContentOptimizationViewSet(viewsets.ModelViewSet):
         idea = service.generate_content_strategy(niche)
         return Response(ContentIdeaSerializer(idea).data)
 
+    @action(detail=False, methods=['post'])
+    def generate_caption(self, request):
+        topic = request.data.get('topic')
+        if not topic:
+            return Response({'error': 'Topic is required'}, status=status.HTTP_400_BAD_REQUEST)
+        service = ContentAIService(request.user)
+        caption = service.generate_caption_for_video(topic)
+        return Response({'caption': caption})
+
     @action(detail=False, methods=['get'])
     def suggested_times(self, request):
         times = OptimalPostTime.objects.filter(user=request.user)

@@ -75,3 +75,19 @@ class ContentAIService:
         chain = prompt | self.llm
         response = chain.invoke({"history": context})
         return response.content
+
+    def generate_caption_for_video(self, video_topic):
+        """
+        Generate a viral TikTok caption and 5 hashtags for a given topic.
+        """
+        prompt = ChatPromptTemplate.from_template("""
+        You are a TikTok Viral Content Creator. 
+        Topic: {topic}
+        
+        Write a short, punchy TikTok caption (under 150 characters) and include 5 trending hashtags.
+        Use emojis and make it engaging.
+        """)
+        
+        chain = prompt | self.llm
+        response = chain.invoke({"topic": video_topic})
+        return response.content
