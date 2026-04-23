@@ -6,10 +6,10 @@ class CommentSuggestion(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     
     # TikTok Data
-    tiktok_video_id = models.CharField(max_length=255)
-    comment_id = models.CharField(max_length=255, unique=True)
+    tiktok_video_id = models.CharField(max_length=255, null=True, blank=True)
+    comment_id = models.CharField(max_length=255, null=True, blank=True)
     comment_text = models.TextField()
-    commenter_username = models.CharField(max_length=255)
+    commenter_username = models.CharField(max_length=255, null=True, blank=True)
     
     # AI Content
     suggested_reply = models.TextField()

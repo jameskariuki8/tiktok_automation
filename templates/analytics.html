@@ -190,7 +190,10 @@
             const response = await fetch('/api/comments-ai/suggestions/suggest_reply/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify({ comment_text: comment })
+                body: JSON.stringify({ 
+                    comment_text: comment,
+                    tiktok_video_id: currentVideoId
+                })
             });
             const data = await response.json();
             textField.innerText = data.suggested_reply;
@@ -212,7 +215,10 @@
             const response = await fetch('/api/comments-ai/suggestions/suggest_reply/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify({ comment_text: message })
+                body: JSON.stringify({ 
+                    comment_text: message,
+                    tiktok_video_id: currentVideoId
+                })
             });
             const data = await response.json();
             alert(`AI Suggestion for DM:\n\n"${data.suggested_reply}"`);
