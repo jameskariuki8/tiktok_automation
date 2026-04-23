@@ -13,10 +13,9 @@ class SchedulerService:
             post.status = 'scheduled'
             post.save()
             
-            # Implementation note: In a real system, we'd use eta with the scheduled_time
-            # publish_scheduled_post.apply_async((post_id,), eta=post.scheduled_time)
-            
-            # For this demo, we'll just schedule it
+            # Triggering synchronously for now to bypass Celery queue issues on Railway
+            from .tasks import publish_scheduled_post
+            publish_scheduled_post(post_id)
             return True
         return False
 

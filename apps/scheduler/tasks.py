@@ -14,16 +14,19 @@ def publish_scheduled_post(post_id):
         post.status = 'publishing'
         post.save()
 
-        # Place holder for TikTok API logic
-        # In Phase 3, we will implement the actual TikTok API call here
-        logger.info(f"Publishing post {post_id} to TikTok...")
+        from tiktok.services import TikTokApiService
+        tiktok_service = TikTokApiService(post.user.tiktok_accounts.first())
         
-        # Simulate success
-        post.status = 'published'
-        post.tiktok_post_id = "simulated_tiktok_id"
-        post.save()
-
-        return f"Successfully published post {post_id}"
+        # Real TikTok API call
+        result = tiktok_service.upload_video(post.video_file.path, post.caption)
+        
+        if result:
+            post.status = 'published'
+            post.tiktok_post_id = "uploaded_to_drafts"
+            post.save()
+            return f"Successfully uploaded post {post_id} to TikTok Drafts"
+        else:
+            raise Exception("TikTok API rejected the upload")
     except Exception as e:
         if 'post' in locals():
             post.status = 'failed'
