@@ -52,38 +52,48 @@ class CommentAIService:
         os.makedirs(os.path.dirname(self.vector_db_path), exist_ok=True)
         vector_db.save_local(self.vector_db_path)
 
+    def _direct_llm_reply(self, text):
+        """
+        Backup reply logic if RAG fails or no knowledge base is present.
+        """
+        prompt = ChatPromptTemplate.from_template("""
+        You are a helpful TikTok assistant. Answer in a friendly, engaging, and professional way.
+        Keep it short (max 2 sentences).
+        Message: {text}
+        Reply:""")
+        try:
+            chain = prompt | self.llm
+            response = chain.invoke({"text": text})
+            return response.content
+        except:
+            return "Thanks for the comment! Stay tuned for more! 🚀"
+
     def generate_reply(self, comment_text):
         """
         Use RAG to generate a reply to a comment.
-        Manual RAG implementation for better compatibility.
         """
+        # Auto-Sync: If no vector DB exists, try to ingest from local file first
+        if not os.path.exists(self.vector_db_path):
+            self.ingest_local_kb()
+            
         if not os.path.exists(self.vector_db_path):
             return self._direct_llm_reply(comment_text)
-
+            
         try:
             vector_db = FAISS.load_local(self.vector_db_path, self.embeddings, allow_dangerous_deserialization=True)
-            
-            # 1. Retrieval
             docs = vector_db.similarity_search(comment_text, k=3)
             context = "\n".join([doc.page_content for doc in docs])
             
-            # 2. Augmentation & Generation
             prompt = ChatPromptTemplate.from_template("""
-            You are a helpful TikTok assistant for a creator. 
-            Use the following pieces of context to answer the user's comment in a friendly, engaging way.
-            If the context doesn't help, use your best judgment as a professional social media manager.
-            Keep it short (max 2 sentences).
-
+            You are a helpful TikTok assistant for a creator. Answer friendly.
             Context: {context}
             Comment: {comment}
-            
-            Friendly Reply:""")
+            Reply:""")
             
             chain = prompt | self.llm
             response = chain.invoke({"context": context, "comment": comment_text})
             return response.content
-        except Exception as e:
-            logger.error(f"RAG failed: {str(e)}")
+        except:
             return self._direct_llm_reply(comment_text)
 
     def generate_dm_reply(self, message_text):
