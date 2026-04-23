@@ -219,13 +219,19 @@
             });
             const data = await response.json();
             
-            btn.innerText = '✅ Replied!';
-            btn.classList.replace('bg-secondary', 'bg-green-500');
-            setTimeout(() => {
-                btn.closest('.ai-reply-box').classList.add('hidden');
-            }, 2000);
+            if(response.ok) {
+                btn.innerText = '✅ Replied!';
+                btn.classList.replace('bg-secondary', 'bg-green-500');
+                setTimeout(() => {
+                    btn.closest('.ai-reply-box').classList.add('hidden');
+                }, 2000);
+            } else {
+                btn.innerText = '❌ ' + (data.error || 'Failed');
+                btn.classList.replace('bg-secondary', 'bg-red-500');
+                btn.disabled = false;
+            }
         } catch (e) {
-            btn.innerText = '❌ Failed';
+            btn.innerText = '❌ Error';
             btn.disabled = false;
         }
     }

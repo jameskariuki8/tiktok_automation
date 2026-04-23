@@ -106,7 +106,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         account = TikTokAccount.objects.filter(user=request.user).first()
         service = TikTokApiService(account)
         
-        success = service.post_comment_reply(video_id, comment_id, text)
+        success, message = service.post_comment_reply(video_id, comment_id, text)
         if success:
             return Response({'status': 'success'})
-        return Response({'success': True, 'note': 'Mock posted (Sandbox limitation)'}) # Safety fallback
+        return Response({'error': message}, status=400)

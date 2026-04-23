@@ -295,8 +295,9 @@ class TikTokApiService:
         Post a reply to a specific comment on TikTok.
         """
         if not self.account:
-            return False
+            return False, "No account connected"
             
+        # Try V2 first
         url = f"{self.BASE_URL}/comment/reply/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -311,9 +312,14 @@ class TikTokApiService:
         try:
             response = requests.post(url, json=data, headers=headers)
             if response.status_code == 200:
-                return True
-            else:
-                print(f"Reply Post Error: {response.text}")
+                return True, "Success"
+            
+            # Fallback to V1 if V2 is restricted
+            v1_url = "https://open.tiktokapis.com/video/comment/reply/"
+            v1_response = requests.post(v1_url, json=data, headers=headers)
+            if v1_response.status_code == 200:
+                return True, "Success (v1)"
+                
+            return False, f"TikTok Error: {response.text}"
         except Exception as e:
-            print(f"Error posting reply: {e}")
-        return False
+            return False, str(e)
