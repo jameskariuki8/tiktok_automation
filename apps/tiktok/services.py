@@ -303,12 +303,21 @@ class TikTokApiService:
         if "sessionid=" not in cookie_header.lower() and len(cookie_header) < 100:
              cookie_header = f"sessionid={self.account.stealth_token}"
              
+        # Extract CSRF token from cookie wall
+        csrf_token = ""
+        import re
+        csrf_match = re.search(r'tt_csrf_token=([^;]+)', cookie_header)
+        if csrf_match:
+            csrf_token = csrf_match.group(1)
+
         headers = {
             'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
             'Cookie': cookie_header,
             'Referer': f"https://www.tiktok.com/video/{video_id}",
             'Content-Type': 'application/x-www-form-urlencoded',
-            'Origin': 'https://www.tiktok.com'
+            'Origin': 'https://www.tiktok.com',
+            'x-csrf-token': csrf_token,
+            'tt-csrf-token': csrf_token
         }
         
         # Web parameters
