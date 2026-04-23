@@ -100,22 +100,22 @@ class TikTokApiService:
             return None
             
         url = f"{self.BASE_URL}/video/list/"
-        params = {
+        data = {
             'fields': 'id,cover_image_url,share_url,video_description,duration,create_time,view_count,like_count,comment_count,share_count',
             'cursor': cursor,
             'max_count': max_count
         }
         headers = {
-            'Authorization': f"Bearer {self.account.access_token}"
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
         }
         
-        response = requests.get(url, params=params, headers=headers)
+        response = requests.post(url, json=data, headers=headers)
         if response.status_code == 200:
             return response.json().get('data', {})
         else:
             print(f"TikTok API Video List Error: {response.text}")
             return {"videos": [], "error": response.text}
-        return None
 
     def sync_video_analytics(self):
         """
@@ -200,17 +200,18 @@ class TikTokApiService:
             return []
             
         url = f"{self.BASE_URL}/video/comment/list/"
-        params = {
+        data = {
             'video_id': video_id,
             'cursor': cursor,
             'max_count': max_count
         }
         headers = {
-            'Authorization': f"Bearer {self.account.access_token}"
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
         }
         
         try:
-            response = requests.get(url, params=params, headers=headers)
+            response = requests.post(url, json=data, headers=headers)
             if response.status_code == 200:
                 return response.json().get('data', {}).get('comments', [])
         except Exception as e:
@@ -227,11 +228,13 @@ class TikTokApiService:
         # TikTok v2 DM API endpoint
         url = f"{self.BASE_URL}/im/conversation/list/"
         headers = {
-            'Authorization': f"Bearer {self.account.access_token}"
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
         }
         
         try:
-            response = requests.get(url, headers=headers)
+            # Note: conversation list usually takes an empty POST body or pagination
+            response = requests.post(url, json={}, headers=headers)
             if response.status_code == 200:
                 return response.json().get('data', {}).get('conversations', [])
         except Exception as e:
