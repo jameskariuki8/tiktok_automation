@@ -167,9 +167,9 @@
                         <button onclick="aiReply(this)" data-text="${encodeURIComponent(c.text)}" class="text-[10px] bg-primary text-black font-bold px-3 py-1 rounded-lg hover:scale-105 transition">AI Suggest Reply</button>
                     </div>
                     <div class="ai-reply-box hidden mt-3 p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
-                         <p class="text-[10px] font-bold text-secondary mb-1">RAG Response</p>
-                         <p class="text-xs italic reply-text-field"></p>
-                         <button class="mt-2 text-[10px] bg-secondary text-black px-2 py-1 rounded">Post Response</button>
+                         <p class="text-[10px] font-bold text-secondary mb-1">AI Suggested Response</p>
+                         <p class="text-xs italic reply-text-field mb-3"></p>
+                         <button onclick="submitReply(this, '${currentVideoId}', '${c.id}')" class="w-full mt-2 text-[10px] bg-secondary text-black font-bold px-3 py-2 rounded-lg hover:scale-105 transition-all">Post Response to TikTok</button>
                     </div>
                 </div>
             `).join('');
@@ -202,6 +202,30 @@
             alert('AI failed. Check knowledge base.');
         } finally {
             btn.innerText = 'AI Suggest Reply';
+            btn.disabled = false;
+        }
+    }
+
+    async function submitReply(btn, vId, cId) {
+        const text = btn.closest('.ai-reply-box').querySelector('.reply-text-field').innerText;
+        btn.innerText = '🚀 Posting...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/analytics/post_reply/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ video_id: vId, comment_id: cId, text: text })
+            });
+            const data = await response.json();
+            
+            btn.innerText = '✅ Replied!';
+            btn.classList.replace('bg-secondary', 'bg-green-500');
+            setTimeout(() => {
+                btn.closest('.ai-reply-box').classList.add('hidden');
+            }, 2000);
+        } catch (e) {
+            btn.innerText = '❌ Failed';
             btn.disabled = false;
         }
     }

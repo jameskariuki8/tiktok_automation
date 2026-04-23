@@ -289,3 +289,31 @@ class TikTokApiService:
         except Exception as e:
             print(f"Error fetching DMs: {e}")
         return []
+
+    def post_comment_reply(self, video_id, comment_id, text):
+        """
+        Post a reply to a specific comment on TikTok.
+        """
+        if not self.account:
+            return False
+            
+        url = f"{self.BASE_URL}/comment/reply/"
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'video_id': video_id,
+            'comment_id': comment_id,
+            'text': text
+        }
+        
+        try:
+            response = requests.post(url, json=data, headers=headers)
+            if response.status_code == 200:
+                return True
+            else:
+                print(f"Reply Post Error: {response.text}")
+        except Exception as e:
+            print(f"Error posting reply: {e}")
+        return False
