@@ -1,3 +1,4 @@
+from django.urls import path
 from .views import TikTokAuthUrlView, TikTokCallbackView, TikTokWebhookView, TikTokAccountListView, TikTokLoginRedirectView, TikTokDisconnectView
 
 urlpatterns = [
