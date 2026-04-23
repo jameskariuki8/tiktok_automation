@@ -176,11 +176,18 @@ class TikTokApiService:
         response = requests.post(url, headers=headers, json=data)
         if response.status_code == 200:
             res_json = response.json()
-            if 'data' in res_json:
-                # In a full implementation, you would now upload the bytes to res_json['data']['upload_url']
-                # For this integration demo, initializing the post is the core hurdle
-                return True
-        return False
+            if res_json.get('error', {}).get('code') == 'ok':
+                return {"status": "success", "publish_id": res_json.get('data', {}).get('publish_id')}
+        
+        # Capture the specific error from TikTok
+        error_msg = response.text
+        try:
+            error_data = response.json()
+            error_msg = error_data.get('error', {}).get('message', response.text)
+        except:
+            pass
+            
+        return {"status": "error", "message": f"TikTok rejected upload: {error_msg}"}
 
     def fetch_comments(self, video_id):
         """

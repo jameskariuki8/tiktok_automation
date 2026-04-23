@@ -179,3 +179,8 @@ CORS_ALLOW_ALL_ORIGINS = True  # For development
 TIKTOK_CLIENT_KEY = env('TIKTOK_CLIENT_KEY', default='')
 TIKTOK_CLIENT_SECRET = env('TIKTOK_CLIENT_SECRET', default='')
 TIKTOK_REDIRECT_URI = env('TIKTOK_REDIRECT_URI', default='')
+
+# Login/Logout Redirects
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+LOGIN_URL = '/admin/login/'

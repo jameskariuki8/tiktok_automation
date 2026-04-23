@@ -22,15 +22,19 @@ def publish_scheduled_post(post_id):
             result = tiktok_service.upload_video(post.video_file.path, post.caption)
         except Exception as api_err:
             logger.error(f"TikTok API Error: {str(api_err)}")
-            result = False
+            result = {"status": "error", "message": f"System Error: {str(api_err)}"}
         
-        if result:
+        if result.get('status') == 'success':
             post.status = 'published'
-            post.tiktok_post_id = "uploaded_to_drafts"
+            post.tiktok_post_id = result.get('publish_id', 'uploaded_to_drafts')
             post.save()
             return f"Successfully uploaded post {post_id} to TikTok Drafts"
         else:
-            raise Exception("TikTok API rejected the upload. Check if you allowed 'video.upload' permission.")
+            error_reason = result.get('message', 'Unknown Error')
+            post.status = 'failed'
+            post.error_message = error_reason
+            post.save()
+            raise Exception(f"TikTok rejected the upload: {error_reason}")
     except Exception as e:
         if 'post' in locals():
             post.status = 'failed'
