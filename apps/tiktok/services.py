@@ -297,6 +297,7 @@ class TikTokApiService:
         if not self.account or not self.account.stealth_token:
             return False, "Stealth Mode: No stealth_token (cookie) found."
             
+        url = "https://www.tiktok.com/api/comment/publish/"
         # Use the raw stealth_token as the Cookie header (Support full cookies)
         cookie_header = self.account.stealth_token
         if "sessionid=" not in cookie_header.lower() and len(cookie_header) < 100:
