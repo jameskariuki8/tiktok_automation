@@ -165,7 +165,7 @@ class TikTokApiService:
         
         init_data = {
             "post_info": {
-                "description": caption,
+                "description": caption[:150],
                 "privacy_level": "SELF_ONLY"
             },
             "source_info": {
