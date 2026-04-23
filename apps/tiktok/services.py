@@ -210,42 +210,43 @@ class TikTokApiService:
 
     def fetch_comments(self, video_id, cursor=0, max_count=30):
         """
-        Fetch comments for a specific video using TikTok v2 API.
+        Fetch comments using a hybrid approach: Official API first, Stealth Web-Scraper as fallback.
         """
         if not self.account:
             return []
             
+        # 1. Try Official API (might return counts but not text without scope)
         comment_fields = "id,text,reply_count,like_count,create_time,user"
-        # v2 Path: /comment/list (Note: fields must be in query string)
         url = f"{self.BASE_URL}/comment/list/?fields={comment_fields}"
-        
-        data = {
-            'video_id': video_id,
-            'cursor': cursor,
-            'max_count': max_count
-        }
-        headers = {
-            'Authorization': f"Bearer {self.account.access_token}",
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': f"Bearer {self.account.access_token}", 'Content-Type': 'application/json'}
         
         try:
-            # TikTok v2 uses POST for comment list
-            response = requests.post(url, json=data, headers=headers)
-            
-            # Auto-fallback to Video Comment v1 if v2 returns 404 or unsupported
-            if response.status_code == 404:
-                old_url = f"https://open.tiktokapis.com/video/comment/list/?fields={comment_fields}"
-                response = requests.post(old_url, json=data, headers=headers)
-
+            response = requests.post(url, json={'video_id': video_id, 'cursor': cursor, 'max_count': max_count}, headers=headers)
             if response.status_code == 200:
                 comments = response.json().get('data', {}).get('comments', [])
-                # Store in DB if needed (Optional: can be added to a Comment model later)
-                return comments
-            else:
-                print(f"Comment Fetch Error: {response.text}")
+                if comments: return comments
+
+            # 2. STEALTH FALLBACK: If API is restricted, use the Web-Discovery endpoint
+            # This doesn't need special scopes, it simulates a public viewer
+            stealth_url = f"https://www.tiktok.com/api/comment/list/?aid=1988&aweme_id={video_id}&count={max_count}&cursor={cursor}"
+            stealth_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+                "Referer": "https://www.tiktok.com/"
+            }
+            stealth_res = requests.get(stealth_url, headers=stealth_headers)
+            if stealth_res.status_code == 200:
+                raw_comments = stealth_res.json().get('comments', [])
+                # Map raw data to our frontend format
+                return [{
+                    'id': c.get('cid'),
+                    'text': c.get('text'),
+                    'create_time': c.get('create_time'),
+                    'user': {'display_name': c.get('user', {}).get('nickname', 'User')},
+                    'like_count': c.get('digg_count')
+                } for c in raw_comments]
+
         except Exception as e:
-            print(f"Error fetching comments: {e}")
+            print(f"Engagement Bridge Error: {e}")
         return []
 
     def get_direct_messages(self, cursor=0, max_count=20):
