@@ -1,4 +1,5 @@
 import hashlib
+# Build: v1.0.2 - Fixed Disconnect Logic
 import base64
 import secrets
 import string
