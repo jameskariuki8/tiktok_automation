@@ -208,7 +208,7 @@ class TikTokApiService:
             
         return {"status": "error", "message": f"Binary upload failed: {upload_response.text}"}
 
-    def fetch_comments(self, video_id, cursor=0, max_count=20):
+    def fetch_comments(self, video_id, cursor=0, max_count=30):
         """
         Fetch comments for a specific video using TikTok v2 API.
         """
@@ -216,8 +216,9 @@ class TikTokApiService:
             return []
             
         comment_fields = "id,text,reply_count,like_count,create_time,user"
-        # v2 Path: /comment/list (No 'video' prefix in some regions)
-        url = f"{self.BASE_URL}/comment/list?fields={comment_fields}"
+        # v2 Path: /comment/list (Note: fields must be in query string)
+        url = f"{self.BASE_URL}/comment/list/?fields={comment_fields}"
+        
         data = {
             'video_id': video_id,
             'cursor': cursor,
@@ -229,15 +230,18 @@ class TikTokApiService:
         }
         
         try:
+            # TikTok v2 uses POST for comment list
             response = requests.post(url, json=data, headers=headers)
             
-            # Auto-fallback to Video Comment v1 if v2 is 404
+            # Auto-fallback to Video Comment v1 if v2 returns 404 or unsupported
             if response.status_code == 404:
                 old_url = f"https://open.tiktokapis.com/video/comment/list/?fields={comment_fields}"
                 response = requests.post(old_url, json=data, headers=headers)
 
             if response.status_code == 200:
-                return response.json().get('data', {}).get('comments', [])
+                comments = response.json().get('data', {}).get('comments', [])
+                # Store in DB if needed (Optional: can be added to a Comment model later)
+                return comments
             else:
                 print(f"Comment Fetch Error: {response.text}")
         except Exception as e:
@@ -246,12 +250,11 @@ class TikTokApiService:
 
     def get_direct_messages(self, cursor=0, max_count=20):
         """
-        Fetch conversation list for the account (DMs).
+        Fetch conversation list for the account (DMs) using TikTok v2.
         """
         if not self.account:
             return []
             
-        # TikTok v2 DM API endpoint
         url = f"{self.BASE_URL}/im/conversation/list/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -259,10 +262,29 @@ class TikTokApiService:
         }
         
         try:
-            # Note: conversation list usually takes an empty POST body or pagination
-            response = requests.post(url, json={}, headers=headers)
+            # Note: conversation list usually takes an empty POST body or pagination params
+            data = {
+                'cursor': cursor,
+                'max_count': max_count
+            }
+            response = requests.post(url, json=data, headers=headers)
+            
             if response.status_code == 200:
-                return response.json().get('data', {}).get('conversations', [])
+                conversations = response.json().get('data', {}).get('conversations', [])
+                # Transform to a flatter format for the frontend
+                results = []
+                for conv in conversations:
+                    latest_msg = conv.get('latest_message', {})
+                    results.append({
+                        'display_name': conv.get('participant', {}).get('display_name', 'TikTok User'),
+                        'avatar_url': conv.get('participant', {}).get('avatar_url', ''),
+                        'latest_message': latest_msg.get('text', 'New conversation started'),
+                        'create_time': latest_msg.get('create_time', 0),
+                        'conversation_id': conv.get('conversation_id')
+                    })
+                return results
+            else:
+                print(f"Inbox Fetch Error: {response.text}")
         except Exception as e:
             print(f"Error fetching DMs: {e}")
         return []

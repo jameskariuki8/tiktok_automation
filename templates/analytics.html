@@ -203,6 +203,27 @@
         }
     }
 
+    async function aiReplyDM(btn) {
+        const message = decodeURIComponent(btn.getAttribute('data-text'));
+        btn.innerText = 'AI Analysis...';
+        btn.disabled = true;
+
+        try {
+            const response = await fetch('/api/comments/suggest_reply/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
+                body: JSON.stringify({ comment_text: message })
+            });
+            const data = await response.json();
+            alert(`AI Suggestion for DM:\n\n"${data.suggested_reply}"`);
+        } catch (e) {
+            alert('AI failed.');
+        } finally {
+            btn.innerText = 'AI Auto-Reply';
+            btn.disabled = false;
+        }
+    }
+
     async function loadInbox() {
         const container = document.getElementById('inbox-list');
         try {
@@ -215,13 +236,15 @@
             }
 
             container.innerHTML = dms.map(dm => `
-                <div class="p-3 bg-secondary/5 border border-secondary/10 rounded-xl space-y-2">
+                <div class="p-3 bg-secondary/5 border border-secondary/10 rounded-xl space-y-2 group">
                     <div class="flex items-center gap-2">
-                        <div class="w-6 h-6 bg-secondary/20 rounded-full flex items-center justify-center text-[10px] font-bold">U</div>
-                        <p class="text-[10px] font-bold truncate">${dm.display_name}</p>
+                        <img src="${dm.avatar_url || 'https://via.placeholder.com/32'}" class="w-6 h-6 rounded-full border border-secondary/20 object-cover">
+                        <p class="text-[10px] font-bold truncate text-secondary">${dm.display_name}</p>
                     </div>
-                    <p class="text-[10px] opacity-60 italic truncate">"${dm.latest_message || 'New Inquiry'}"</p>
-                    <button class="w-full py-1 bg-secondary/10 text-secondary border border-secondary/20 text-[10px] rounded hover:bg-secondary/20 transition">AI Auto-Reply</button>
+                    <p class="text-[10px] opacity-80 leading-snug line-clamp-2">"${dm.latest_message}"</p>
+                    <div class="flex gap-2">
+                        <button onclick="aiReplyDM(this)" data-text="${encodeURIComponent(dm.latest_message)}" class="w-full py-1 bg-secondary/10 text-secondary border border-secondary/20 text-[10px] rounded hover:bg-secondary/20 transition-all font-bold">AI Auto-Reply</button>
+                    </div>
                 </div>
             `).join('');
         } catch (e) {
