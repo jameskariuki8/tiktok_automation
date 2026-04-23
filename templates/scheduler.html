@@ -24,24 +24,8 @@
                     Upcoming Queue
                 </h3>
                 <div class="space-y-4" id="scheduled-posts-list">
-                    <!-- Sample Item -->
-                    <div class="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center gap-4 group hover:border-primary/50 transition-colors">
-                        <div class="w-16 h-24 bg-dark rounded-lg overflow-hidden relative">
-                            <div class="absolute inset-0 flex items-center justify-center bg-black/40">
-                                <svg class="w-6 h-6 text-white opacity-60" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
-                            </div>
-                        </div>
-                        <div class="flex-1">
-                            <p class="font-medium text-sm truncate max-w-[200px]">Product Demo - New Features...</p>
-                            <p class="text-xs opacity-50 mt-1">Tomorrow at 6:00 PM</p>
-                            <div class="flex gap-2 mt-2">
-                                <span class="text-[10px] bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">AI Optimized</span>
-                                <span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Ready</span>
-                            </div>
-                        </div>
-                        <button class="p-2 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                        </button>
+                    <div class="p-8 text-center opacity-40">
+                        <p class="text-sm">Loading your posts...</p>
                     </div>
                 </div>
             </div>
@@ -114,6 +98,36 @@
 </div>
 
 <script>
+    async function loadScheduledPosts() {
+        try {
+            const response = await fetch('/api/scheduler/posts/');
+            const posts = await response.json();
+            const container = document.getElementById('scheduled-posts-list');
+            
+            if (posts.length === 0) {
+                container.innerHTML = '<div class="p-8 text-center opacity-40"><p class="text-sm">No upcoming posts. Start by creating one!</p></div>';
+                return;
+            }
+
+            container.innerHTML = posts.map(post => `
+                <div class="p-4 bg-white/5 border border-white/10 rounded-xl flex items-center gap-4 group hover:border-primary/50 transition-colors">
+                    <div class="w-16 h-24 bg-dark rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-white opacity-20" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"></path></svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="font-medium text-sm truncate max-w-[200px]">${post.caption || 'No Caption'}</p>
+                        <p class="text-xs opacity-50 mt-1">${new Date(post.scheduled_time).toLocaleString()}</p>
+                        <div class="flex gap-2 mt-2">
+                             <span class="text-[10px] ${post.status === 'published' ? 'bg-green-500/20 text-green-400' : 'bg-primary/20 text-primary'} px-2 py-0.5 rounded-full uppercase font-bold">${post.status}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (e) {
+            console.error('Failed to load posts', e);
+        }
+    }
+
     document.getElementById('ai-suggest-btn').addEventListener('click', async () => {
         const topic = document.getElementById('topic').value;
         if(!topic) return alert('Please enter a topic for the AI to analyze!');
@@ -124,7 +138,7 @@
         btn.disabled = true;
 
         try {
-            const response = await fetch('/api/content-ai/generate-caption/', {
+            const response = await fetch('/api/content-ai/generate_caption/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -172,5 +186,7 @@
             btn.disabled = false;
         }
     });
+
+    loadScheduledPosts();
 </script>
 {% endblock %}
