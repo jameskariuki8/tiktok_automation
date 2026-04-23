@@ -76,10 +76,18 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=False, methods=['get'])
     def video_list(self, request):
         from tiktok.services import TikTokApiService
-        account = TikTokAccount.objects.filter(user=request.user).first()
+        queryset = TikTokAccount.objects.filter(user=request.user)
+        account = queryset.first()
         if not account:
             return Response({'error': 'No TikTok account connected'}, status=400)
         
         service = TikTokApiService(account)
+        # Fetch directly from TikTok
         data = service.get_video_list()
-        return Response(data.get('videos', []) if data else [])
+        
+        if data and 'videos' in data:
+            return Response(data['videos'])
+        
+        # Fallback to database if API fails
+        db_videos = VideoAnalytics.objects.filter(account=account).order_by('-view_count')
+        return Response(VideoAnalyticsSerializer(db_videos, many=True).data)
