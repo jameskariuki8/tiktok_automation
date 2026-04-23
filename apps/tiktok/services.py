@@ -201,7 +201,8 @@ class TikTokApiService:
             return []
             
         comment_fields = "id,text,reply_count,like_count,create_time,user"
-        url = f"{self.BASE_URL}/video/comment/list/?fields={comment_fields}"
+        # Removing trailing slash to prevent 404 on some TikTok v2 gateways
+        url = f"{self.BASE_URL}/video/comment/list?fields={comment_fields}"
         data = {
             'video_id': video_id,
             'cursor': cursor,
