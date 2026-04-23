@@ -45,6 +45,15 @@ class CommentSuggestionViewSet(viewsets.ModelViewSet):
         service = CommentAIService(request.user)
         reply = service.generate_reply(comment_text)
 
+        # DUMMY FALLBACK for missing IDs (Bypasses DB Constraints until migrations land)
+        if not comment_id:
+            import uuid
+            comment_id = f"gen_{uuid.uuid4().hex[:12]}"
+        if not tiktok_video_id:
+            tiktok_video_id = "live_comment"
+        if not commenter_username:
+            commenter_username = "TikTok Fan"
+
         suggestion = CommentSuggestion.objects.create(
             user=request.user,
             tiktok_video_id=tiktok_video_id,
