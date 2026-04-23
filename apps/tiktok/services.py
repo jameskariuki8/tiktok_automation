@@ -157,17 +157,17 @@ class TikTokApiService:
         file_size = os.path.getsize(video_path)
         
         # Step 1: Initialize the post
-        url = f"{self.BASE_URL}/post/publish/video/init/"
+        init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
-            'Content-Type': 'application/json; charset=UTF-8'
+            'Content-Type': 'application/json'
         }
         
-        data = {
+        init_data = {
             "post_info": {
-                "title": caption[:80], # TikTok title limit
+                "title": caption[:80],
                 "description": caption,
-                "privacy_level": "SELF_ONLY" # Sandbox apps are usually limited to private/drafts
+                "privacy_level": "PUBLIC_TO_EVERYONE"
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
@@ -177,21 +177,37 @@ class TikTokApiService:
             }
         }
         
-        response = requests.post(url, headers=headers, json=data)
-        if response.status_code == 200:
-            res_json = response.json()
-            if res_json.get('error', {}).get('code') == 'ok':
-                return {"status": "success", "publish_id": res_json.get('data', {}).get('publish_id')}
+        init_response = requests.post(init_url, headers=headers, json=init_data)
+        init_json = init_response.json()
         
-        # Capture the specific error from TikTok
-        error_msg = response.text
-        try:
-            error_data = response.json()
-            error_msg = error_data.get('error', {}).get('message', response.text)
-        except:
-            pass
+        if init_json.get('error', {}).get('code') != 'ok':
+            return {"status": "error", "message": f"TikTok initialization failed: {init_json.get('error', {}).get('message')}"}
             
-        return {"status": "error", "message": f"TikTok rejected upload: {error_msg}"}
+        data_block = init_json.get('data', {})
+        upload_url = data_block.get('upload_url')
+        publish_id = data_block.get('publish_id')
+        
+        if not upload_url:
+            return {"status": "error", "message": "No upload URL provided by TikTok."}
+
+        # Step 2: Upload the binary file
+        with open(video_path, 'rb') as f:
+            upload_headers = {
+                'Content-Type': 'video/mp4',
+                'Content-Length': str(file_size)
+            }
+            # TikTok v2 requires the file to be PUT to the upload_url
+            # We must use the exact Content-Range if it was chunked, but here it's 1 chunk
+            chunk_headers = {
+                'Content-Range': f'bytes 0-{file_size-1}/{file_size}',
+                'Content-Type': 'video/mp4'
+            }
+            upload_response = requests.put(upload_url, data=f, headers=chunk_headers)
+            
+        if upload_response.status_code in [200, 201]:
+            return {"status": "success", "publish_id": publish_id}
+            
+        return {"status": "error", "message": f"Binary upload failed: {upload_response.text}"}
 
     def fetch_comments(self, video_id, cursor=0, max_count=20):
         """
