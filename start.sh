@@ -1,7 +1,9 @@
 #!/bin/bash
-# High-Reliability Start Script for TikTok Bot
+echo "🚀 Phase 0: Clearing the old gears..."
+rm -f db.sqlite3
 
-echo "🚀 Phase 1: Warming up the Database Engine..."
+echo "🚀 Phase 1: Rebuilding the Database Engine..."
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput
 
 echo "🚀 Phase 2: Clearing the launchpad..."
