@@ -153,6 +153,17 @@
         document.getElementById('v-likes').innerText = likes;
         document.getElementById('v-comments').innerText = comments;
 
+        await loadInbox();
+        
+        // Check stealth status
+        const accountsRes = await fetch('/api/tiktok/accounts/');
+        const accounts = await accountsRes.json();
+        if (accounts.length > 0 && accounts[0].stealth_token) {
+            const input = document.getElementById('stealth-token-input');
+            input.placeholder = "🕵️‍♂️ Stealth Bridge is ACTIVE";
+            input.classList.add('border-primary', 'text-primary');
+        }
+
         loadComments(id);
     }
 
