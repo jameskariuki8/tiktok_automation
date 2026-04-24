@@ -2,8 +2,11 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 
 def home(request):
-    if request.user.is_authenticated:
-        from tiktok.models import TikTokAccount
+    if not request.user.is_authenticated:
+        from django.http import HttpResponse
+        return HttpResponse("TikTok Automation Online", status=200)
+        
+    from tiktok.models import TikTokAccount
         from analytics.models import AccountAnalytics
         
         account = TikTokAccount.objects.filter(user=request.user).first()
