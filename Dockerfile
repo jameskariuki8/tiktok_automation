@@ -33,6 +33,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN playwright install chromium
 RUN mkdir -p /app/static
+
+# Pre-bake the database migrations into the image for instant boot
+RUN python manage.py migrate
+
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-CMD ["sh", "-c", "python manage.py migrate && exec gunicorn --bind 0.0.0.0:$PORT config.wsgi --log-file -"]
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "config.wsgi", "--log-file", "-"]
