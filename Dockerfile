@@ -36,4 +36,6 @@ RUN mkdir -p /app/static
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-CMD ["sh", "-c", "python manage.py migrate && exec gunicorn --bind 0.0.0.0:$PORT config.wsgi:application --workers 1 --timeout 180 --log-file -"]
+RUN chmod +x /app/start.sh
+
+CMD ["/app/start.sh"]
