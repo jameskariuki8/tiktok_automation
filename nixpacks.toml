@@ -2,7 +2,7 @@
 nixPkgs = ["python", "google-chrome", "playwright-driver.browsers"]
 
 [phases.install]
-cmds = ["pip install -r requirements.txt"]
+cmds = ["pip install -r requirements.txt", "PLAYWRIGHT_BROWSERS_PATH=/app/.cache playwright install chromium"]
 
-[phases.build]
-cmds = ["playwright install chromium"]
+[variables]
+PLAYWRIGHT_BROWSERS_PATH = "/app/.cache"
