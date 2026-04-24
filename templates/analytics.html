@@ -138,7 +138,7 @@
         }
     }
 
-    function selectVideo(id, views, likes, comments, desc, img) {
+    async function selectVideo(id, views, likes, comments, desc, img) {
         currentVideoId = id;
         
         document.getElementById('selected-video-header').innerHTML = `
@@ -153,19 +153,23 @@
         document.getElementById('v-likes').innerText = likes;
         document.getElementById('v-comments').innerText = comments;
 
-        await loadInbox();
-        
-        // Check stealth status
-        const accountsRes = await fetch('/api/tiktok/accounts/');
-        const accounts = await accountsRes.json();
-        if (accounts.length > 0 && accounts[0].stealth_token) {
-            const input = document.getElementById('stealth-token-input');
-            input.placeholder = "🕵️‍♂️ Stealth Bridge is ACTIVE";
-            input.classList.add('border-primary', 'text-primary');
-        }
-
         loadComments(id);
     }
+
+    async function checkStealthStatus() {
+        try {
+            const accountsRes = await fetch('/api/tiktok/accounts/');
+            const accounts = await accountsRes.json();
+            if (accounts.length > 0 && accounts[0].stealth_token) {
+                const input = document.getElementById('stealth-token-input');
+                input.placeholder = "🕵️‍♂️ Stealth Bridge is ACTIVE";
+                input.classList.add('border-primary', 'text-primary');
+            }
+        } catch(e) {}
+    }
+
+    window.addEventListener('scroll', checkStealthStatus, { once: true }); // Check once on interact
+    setTimeout(checkStealthStatus, 1000); // Check once after load
 
     async function loadComments(videoId) {
         const container = document.getElementById('video-comments-list');
