@@ -303,10 +303,7 @@ class TikTokApiService:
 
             async def send_via_api():
                 async with TikTokApi() as api:
-                    # Force permanent browser path for Railway
-                    import os
-                    os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/app/.cache'
-                    
+                    # Docker handles the browser path
                     import shutil
                     exec_path = shutil.which("chromium") or shutil.which("google-chrome")
                     
