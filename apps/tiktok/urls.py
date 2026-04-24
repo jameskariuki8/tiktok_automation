@@ -1,4 +1,5 @@
 from django.urls import path
+from . import views, qr_views
 from .views import TikTokAuthUrlView, TikTokCallbackView, TikTokWebhookView, TikTokAccountListView, TikTokLoginRedirectView, TikTokDisconnectView, TikTokSaveStealthTokenView
 
 urlpatterns = [
@@ -9,4 +10,5 @@ urlpatterns = [
     path('webhook/', TikTokWebhookView.as_view(), name='tiktok-webhook'),
     path('accounts/', TikTokAccountListView.as_view(), name='tiktok-accounts'),
     path('save-stealth-token/', TikTokSaveStealthTokenView.as_view(), name='tiktok-save-stealth'),
+    path('qr-login/', qr_views.TikTokQRLoginView.as_view(), name='qr-login'),
 ]
