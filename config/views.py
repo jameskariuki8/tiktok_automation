@@ -7,18 +7,17 @@ def home(request):
         return HttpResponse("TikTok Automation Online", status=200)
         
     from tiktok.models import TikTokAccount
-        from analytics.models import AccountAnalytics
+    from analytics.models import AccountAnalytics
+    
+    account = TikTokAccount.objects.filter(user=request.user).first()
+    analytics = None
+    if account:
+        analytics = AccountAnalytics.objects.filter(account=account).order_by('-date').first()
         
-        account = TikTokAccount.objects.filter(user=request.user).first()
-        analytics = None
-        if account:
-            analytics = AccountAnalytics.objects.filter(account=account).order_by('-date').first()
-            
-        return render(request, 'dashboard.html', {
-            'account': account,
-            'analytics': analytics
-        })
-    return render(request, 'base.html')
+    return render(request, 'dashboard.html', {
+        'account': account,
+        'analytics': analytics
+    })
 
 @login_required
 def scheduler_view(request):
