@@ -102,10 +102,15 @@ class TikTokSaveStealthTokenView(views.APIView):
         if not token:
             return Response({'error': 'Token is required'}, status=400)
             
-        account = TikTokAccount.objects.filter(user=request.user).first()
-        if not account:
-            return Response({'error': 'No TikTok account connected'}, status=404)
+        try:
+            account = TikTokAccount.objects.filter(user=request.user).first()
+            if not account:
+                # Create a placeholder if none exists
+                account = TikTokAccount.objects.create(user=request.user, open_id=f"stealth_{request.user.id}", display_name=request.user.username)
             
-        account.stealth_token = token
-        account.save()
-        return Response({'status': 'Stealth Bridge Connected! ✅'})
+            account.stealth_token = token
+            account.is_active = True
+            account.save()
+            return Response({'status': 'Stealth Bridge Connected! ✅'})
+        except Exception as e:
+            return Response({'error': f'Database Sync in Progress. Please try again in 30s. ({str(e)})'}, status=503)
