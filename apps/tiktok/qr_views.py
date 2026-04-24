@@ -12,8 +12,10 @@ class TikTokQRLoginView(APIView):
 
     async def get_qr_data(self, user):
         async with async_playwright() as p:
-            # Try to use system-installed chromium if it exists (for Railway)
-            executable_path = "/usr/bin/chromium" if os.path.exists("/usr/bin/chromium") else None
+            # Search for real browser paths on Railway
+            paths = ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"]
+            executable_path = next((p for p in paths if os.path.exists(p)), None)
+            
             browser = await p.chromium.launch(headless=True, executable_path=executable_path)
             context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             page = await context.new_page()
