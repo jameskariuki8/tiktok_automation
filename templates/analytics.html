@@ -30,11 +30,12 @@
                 <p class="text-[10px] text-gray-400">Paste your sessionid to bypass TikTok API blocks.</p>
             </div>
         </div>
-        <div class="flex-1 max-w-md flex gap-2">
-            <input type="password" id="stealth-token-input" placeholder="Paste sessionid here..." 
-                   class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-primary outline-none transition-all">
-            <button onclick="saveStealthToken()" class="px-6 py-2 bg-primary text-black font-bold rounded-xl text-xs hover:scale-105 active:scale-95 transition-all">Connect Bridge</button>
-        </div>
+            <div class="flex-1 max-w-2xl flex gap-2">
+                <input type="password" id="stealth-token-input" placeholder="Paste Master Key here or use Magic Sync..." 
+                       class="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-xs focus:ring-1 focus:ring-primary outline-none transition-all">
+                <button onclick="saveStealthToken()" class="px-4 py-2 bg-primary text-black font-bold rounded-xl text-xs hover:scale-105 transition-all">Manual Connect</button>
+                <button onclick="copyMagicSync()" class="px-4 py-2 bg-white/10 text-white font-bold rounded-xl text-xs hover:bg-white/20 transition-all border border-white/20">🪄 Copy Magic Sync</button>
+            </div>
     </div>
 
     <!-- Main 3-Pane Layout -->
@@ -270,6 +271,17 @@
             btn.innerText = 'AI Auto-Reply';
             btn.disabled = false;
         }
+    }
+
+    function copyMagicSync() {
+        const magicScript = `window.prompt("COPY ALL TEXT BELOW (Ctrl+A, Ctrl+C):", document.cookie);`;
+        const el = document.createElement('textarea');
+        el.value = magicScript;
+        document.body.appendChild(el);
+        el.select();
+        document.execCommand('copy');
+        document.body.removeChild(el);
+        alert('🪄 Magic Sync Copied! \\n\\n1. Go to your TikTok Tab\\n2. Press F12 -> Console\\n3. Paste and Enter\\n4. Copy the result back here!');
     }
 
     async function saveStealthToken() {
