@@ -16,35 +16,57 @@ class TikTokQRLoginView(APIView):
             import shutil
             executable_path = shutil.which("chromium") or shutil.which("google-chrome")
             
-            browser = await p.chromium.launch(headless=True, executable_path=executable_path)
+            browser = await p.chromium.launch(
+                headless=True,
+                executable_path=executable_path,
+                args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+            )
             context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
             page = await context.new_page()
             
             await page.goto("https://www.tiktok.com/login/auth-platform-code/qr")
             
             try:
-                qr_selector = 'canvas'
-                await page.wait_for_selector(qr_selector, timeout=15000)
-                qr_element = await page.query_selector(qr_selector)
+                # Optimized for the Auth-Platform-Code flow
+                await page.wait_for_load_state("networkidle")
+                
+                # Check for multiple possible QR selectors
+                qr_selectors = ['canvas', 'img[src*="qrcode"]', '.tiktok-qr-code-png']
+                qr_element = None
+                
+                for selector in qr_selectors:
+                    try:
+                        await page.wait_for_selector(selector, timeout=5000)
+                        qr_element = await page.query_selector(selector)
+                        if qr_element: break
+                    except: continue
+
+                if not qr_element:
+                    return "ERROR: QR Element not found on page.", None
+
                 image_bytes = await qr_element.screenshot()
                 qr_base64 = base64.b64encode(image_bytes).decode('utf-8')
                 
-                # Update status in background? No, let's just wait here for a bit
-                # Simple poll: wait for redirect or cookie change
-                for _ in range(60): # 60 seconds timeout
+                # Poll for up to 45 seconds (Safe for Railway)
+                for _ in range(45):
                     cookies = await context.cookies()
-                    session_id = next((c['value'] for c in cookies if c['name'] == 'sessionid'), None)
-                    if session_id:
-                        # Success! Save full cookies wall
+                    cookies_dict = {c['name']: c['value'] for c in cookies}
+                    
+                    if "sessionid" in cookies_dict:
+                        # Success! Save the full cookie wall
                         cookie_wall = "; ".join([f"{c['name']}={c['value']}" for c in cookies])
                         account = TikTokAccount.objects.filter(user=user).first()
-                        if account:
-                            account.stealth_token = cookie_wall
-                            account.save()
+                        if not account:
+                            account = TikTokAccount(user=user)
+                        
+                        account.stealth_token = cookie_wall
+                        account.is_active = True
+                        account.save()
                         return "SUCCESS", qr_base64
+                    
                     await asyncio.sleep(1)
                     
-                return "TIMEOUT", qr_base64
+                return "READY", qr_base64
             except Exception as e:
                 return f"ERROR: {str(e)}", None
             finally:

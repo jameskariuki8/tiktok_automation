@@ -312,7 +312,8 @@ class TikTokApiService:
                         ms_tokens=[self.account.stealth_token], 
                         num_sessions=1, 
                         sleep_after=2,
-                        executable_path=exec_path
+                        executable_path=exec_path,
+                        args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
                     )
                     
                     # Target endpoint for publishing
