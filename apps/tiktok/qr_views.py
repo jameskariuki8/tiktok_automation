@@ -7,19 +7,14 @@ from playwright.async_api import async_playwright
 import os
 from .models import TikTokAccount
 
-# Force permanent browser path for Railway
-os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/app/.cache'
-
+# Native Nix Chromium is in the path
 class TikTokQRLoginView(APIView):
     permission_classes = [IsAuthenticated]
 
     async def get_qr_data(self, user):
         async with async_playwright() as p:
             import shutil
-            executable_path = shutil.which("google-chrome-stable") or \
-                              shutil.which("google-chrome") or \
-                              shutil.which("chromium") or \
-                              shutil.which("chromium-browser")
+            executable_path = shutil.which("chromium") or shutil.which("google-chrome")
             
             browser = await p.chromium.launch(headless=True, executable_path=executable_path)
             context = await browser.new_context(user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")

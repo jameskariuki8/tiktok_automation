@@ -303,12 +303,9 @@ class TikTokApiService:
 
             async def send_via_api():
                 async with TikTokApi() as api:
-                    # Sync browser path for Railway
+                    # Native Nix Chromium path
                     import shutil
-                    exec_path = shutil.which("google-chrome-stable") or \
-                                shutil.which("google-chrome") or \
-                                shutil.which("chromium") or \
-                                shutil.which("chromium-browser")
+                    exec_path = shutil.which("chromium") or shutil.which("google-chrome")
                     
                     # Initialize with browser context
                     await api.create_sessions(
