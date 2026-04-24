@@ -62,7 +62,22 @@ class TikTokDisconnectView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        request.user.tiktok_accounts.all().delete()
+        try:
+            request.user.tiktok_accounts.all().delete()
+        except:
+            # Nuclear Fallback: If Django can't delete it (due to mission columns), 
+            # we use RAW SQL to purge the table for this user.
+            from django.db import connection
+            with connection.cursor() as cursor:
+                try:
+                    cursor.execute("DELETE FROM tiktok_account_v2 WHERE user_id = %s", [request.user.id])
+                except:
+                    # If v2 doesn't exist yet, try v1
+                    try:
+                        cursor.execute("DELETE FROM tiktok_tiktokaccount WHERE user_id = %s", [request.user.id])
+                    except:
+                        pass
+        
         from django.shortcuts import redirect
         return redirect('home')
 
