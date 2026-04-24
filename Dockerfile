@@ -39,4 +39,4 @@ RUN python manage.py migrate
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "config.wsgi", "--log-file", "-"]
+CMD ["gunicorn", "--bind", "0.0.0.0:$PORT", "config.wsgi:application", "--timeout", "120", "--log-file", "-"]
