@@ -96,7 +96,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database Setup
 DATABASES = {
-    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')
+    'default': env.db('DATABASE_URL', default=f'sqlite:////{os.path.join(BASE_DIR, "db.sqlite3")}')
 }
 
 # Password validation
