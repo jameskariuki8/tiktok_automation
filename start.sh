@@ -4,7 +4,8 @@ echo "🐳 DOCKER ENGINE ENGAGED"
 echo "🚀 Phase 0: Erasing Zombie Records..."
 rm -rf /app/db.sqlite3
 
-echo "🚀 Phase 1: Rebuilding the Perfect Architecture..."
+echo "🚀 Phase 1: Building the New Architecture..."
+python manage.py makemigrations --noinput
 python manage.py migrate --noinput --settings=config.settings || { echo "❌ MIGRATION FAILED!"; exit 1; }
 
 echo "🚀 Phase 2: Activating Social Command Center..."
