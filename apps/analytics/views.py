@@ -67,7 +67,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         from tiktok.services import TikTokApiService
         account = TikTokAccount.objects.filter(user=request.user).first()
         if not account:
-            return Response({'error': 'No TikTok account connected'}, status=400)
+            return Response([])
             
         service = TikTokApiService(account)
         messages = service.get_direct_messages()
@@ -79,7 +79,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = TikTokAccount.objects.filter(user=request.user)
         account = queryset.first()
         if not account:
-            return Response({'error': 'No TikTok account connected'}, status=400)
+            return Response([])
         
         service = TikTokApiService(account)
         # Fetch directly from TikTok
