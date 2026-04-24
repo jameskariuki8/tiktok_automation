@@ -35,4 +35,4 @@ RUN playwright install chromium
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT config.wsgi --log-file -"]
+CMD ["sh", "-c", "python manage.py migrate && mkdir -p /app/static && python manage.py collectstatic --noinput && gunicorn config.wsgi --bind 0.0.0.0:8080 --workers 4 --log-file -"]
