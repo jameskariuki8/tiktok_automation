@@ -303,9 +303,23 @@ class TikTokApiService:
 
             async def send_via_api():
                 async with TikTokApi() as api:
-                    # Sync cookies from our stealth_token
-                    # Note: TikTokApi v6 handles sessions automatically
-                    await api.create_sessions(ms_tokens=[self.account.stealth_token], num_sessions=1, sleep_after=2)
+                    # Sync browser path for Railway
+                    import os
+                    paths = [
+                        "/usr/bin/google-chrome-stable",
+                        "/usr/bin/google-chrome",
+                        "/usr/bin/chromium", 
+                        "/usr/bin/chromium-browser"
+                    ]
+                    exec_path = next((p for p in paths if os.path.exists(p)), None)
+                    
+                    # Initialize with browser context
+                    await api.create_sessions(
+                        ms_tokens=[self.account.stealth_token], 
+                        num_sessions=1, 
+                        sleep_after=2,
+                        executable_path=exec_path
+                    )
                     
                     # Target endpoint for publishing
                     url = "https://www.tiktok.com/api/comment/publish/"

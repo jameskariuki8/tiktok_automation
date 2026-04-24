@@ -13,7 +13,12 @@ class TikTokQRLoginView(APIView):
     async def get_qr_data(self, user):
         async with async_playwright() as p:
             # Search for real browser paths on Railway
-            paths = ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"]
+            paths = [
+                "/usr/bin/google-chrome-stable",
+                "/usr/bin/google-chrome",
+                "/usr/bin/chromium", 
+                "/usr/bin/chromium-browser"
+            ]
             executable_path = next((p for p in paths if os.path.exists(p)), None)
             
             browser = await p.chromium.launch(headless=True, executable_path=executable_path)
