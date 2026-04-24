@@ -29,8 +29,10 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --no-cache-dir -e .
+RUN pip install --no-cache-dir -r requirements.txt
 
 RUN playwright install chromium
+
+ENV PYTHONPATH=/app:$PYTHONPATH
 
 CMD ["sh", "-c", "python manage.py migrate && gunicorn config.wsgi --log-file -"]
