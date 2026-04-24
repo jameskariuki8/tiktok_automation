@@ -5,7 +5,7 @@ import base64
 import asyncio
 from playwright.async_api import async_playwright
 import os
-from apps.tiktok.models import TikTokAccount
+from .models import TikTokAccount
 
 class TikTokQRLoginView(APIView):
     permission_classes = [IsAuthenticated]
