@@ -32,7 +32,7 @@ COPY . .
 RUN pip install --no-cache-dir -r requirements.txt
 
 RUN playwright install chromium
-
+RUN mkdir -p /app/static
 ENV PYTHONPATH=/app:$PYTHONPATH
 
-CMD ["sh", "-c", "python manage.py migrate && gunicorn --bind 0.0.0.0:$PORT config.wsgi --log-file -"]
+CMD ["sh", "-c", "python manage.py migrate && exec gunicorn --bind 0.0.0.0:$PORT config.wsgi --log-file -"]
