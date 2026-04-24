@@ -7,6 +7,9 @@ from playwright.async_api import async_playwright
 import os
 from .models import TikTokAccount
 
+# Force permanent browser path for Railway
+os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/app/.cache'
+
 class TikTokQRLoginView(APIView):
     permission_classes = [IsAuthenticated]
 
