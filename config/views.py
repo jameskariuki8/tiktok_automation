@@ -9,14 +9,17 @@ def home(request):
     from tiktok.models import TikTokAccount
     from analytics.models import AccountAnalytics
     
-    account = TikTokAccount.objects.filter(user=request.user).first()
-    analytics = None
-    if account:
-        analytics = AccountAnalytics.objects.filter(account=account).order_by('-date').first()
-        
+    try:
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        is_stealth_synced = bool(account and account.stealth_token)
+    except:
+        # Graceful fallback if migrations haven't reached the server yet
+        account = None
+        is_stealth_synced = False
+    
     return render(request, 'dashboard.html', {
         'account': account,
-        'analytics': analytics
+        'is_stealth_synced': is_stealth_synced
     })
 
 @login_required
