@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ["python", "chromium"]
+
+[phases.install]
+cmds = ["python -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt", "playwright install chromium"]
