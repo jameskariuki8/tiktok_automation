@@ -303,7 +303,10 @@ class TikTokApiService:
 
             async def send_via_api():
                 async with TikTokApi() as api:
-                    # Native Nix Chromium path
+                    # Force permanent browser path for Railway
+                    import os
+                    os.environ['PLAYWRIGHT_BROWSERS_PATH'] = '/app/.cache'
+                    
                     import shutil
                     exec_path = shutil.which("chromium") or shutil.which("google-chrome")
                     
