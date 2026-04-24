@@ -297,7 +297,7 @@ class TikTokApiService:
         if not self.account or not self.account.stealth_token:
             return False, "Stealth Mode: No stealth_token (cookie) found."
             
-        url = "https://www.tiktok.com/api/comment/publish/"
+        url = "https://m.tiktok.com/api/comment/publish/"
         # Use the raw stealth_token as the Cookie header (Support full cookies)
         cookie_header = self.account.stealth_token
         if "sessionid=" not in cookie_header.lower() and len(cookie_header) < 100:
@@ -311,11 +311,17 @@ class TikTokApiService:
             csrf_token = csrf_match.group(1)
 
         headers = {
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_6 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.6 Mobile/15E148 Safari/604.1',
+            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
             'Cookie': cookie_header,
             'Referer': f"https://www.tiktok.com/video/{video_id}",
             'Content-Type': 'application/x-www-form-urlencoded',
             'Origin': 'https://www.tiktok.com',
+            'Accept': 'application/json, text/plain, */*',
+            'Accept-Language': 'en-US,en;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br, zstd',
+            'Sec-Fetch-Dest': 'empty',
+            'Sec-Fetch-Mode': 'cors',
+            'Sec-Fetch-Site': 'same-origin',
             'x-csrf-token': csrf_token,
             'tt-csrf-token': csrf_token
         }
