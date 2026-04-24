@@ -292,64 +292,54 @@ class TikTokApiService:
 
     def post_comment_reply_stealth(self, video_id, comment_id, text):
         """
-        Stealth Bridge: Post a reply using the web-engine and sessionid cookie.
+        Pro Stealth Bridge: Uses TikTok-Api (David Teather) signatures.
         """
         if not self.account or not self.account.stealth_token:
             return False, "Stealth Mode: No stealth_token (cookie) found."
-            
-        url = "https://m.tiktok.com/api/comment/publish/"
-        # Use the raw stealth_token as the Cookie header (Support full cookies)
-        cookie_header = self.account.stealth_token
-        if "sessionid=" not in cookie_header.lower() and len(cookie_header) < 100:
-             cookie_header = f"sessionid={self.account.stealth_token}"
-             
-        # Extract CSRF token from cookie wall
-        csrf_token = ""
-        import re
-        csrf_match = re.search(r'tt_csrf_token=([^;]+)', cookie_header)
-        if csrf_match:
-            csrf_token = csrf_match.group(1)
 
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 17_4_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4.1 Mobile/15E148 Safari/604.1',
-            'Cookie': cookie_header,
-            'Referer': f"https://www.tiktok.com/video/{video_id}",
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Origin': 'https://www.tiktok.com',
-            'Accept': 'application/json, text/plain, */*',
-            'Accept-Language': 'en-US,en;q=0.9',
-            'Accept-Encoding': 'gzip, deflate, br, zstd',
-            'Sec-Fetch-Dest': 'empty',
-            'Sec-Fetch-Mode': 'cors',
-            'Sec-Fetch-Site': 'same-origin',
-            'x-csrf-token': csrf_token,
-            'tt-csrf-token': csrf_token
-        }
-        
-        # Web parameters
-        data = {
-            'aweme_id': video_id,
-            'text': text,
-            'reply_id': comment_id,
-            'channel_id': '0',
-            'type': '1'
-        }
-        
         try:
-            response = requests.post(url, data=data, headers=headers)
-            print(f"DEBUG: Stealth Response: {response.text}")
+            from TikTokApi import TikTokApi
+            import asyncio
+
+            async def send_via_api():
+                async with TikTokApi() as api:
+                    # Sync cookies from our stealth_token
+                    # Note: TikTokApi v6 handles sessions automatically
+                    await api.create_sessions(ms_tokens=[self.account.stealth_token], num_sessions=1, sleep_after=2)
+                    
+                    # Target endpoint for publishing
+                    url = "https://www.tiktok.com/api/comment/publish/"
+                    params = {
+                        "aweme_id": video_id,
+                        "text": text,
+                        "reply_id": comment_id,
+                        "channel_id": "0",
+                        "type": "1"
+                    }
+                    
+                    # Sign and execute
+                    # The library provides a 'make_request' that handles signatures
+                    response = await api.make_request(url, params=params, method="POST")
+                    return response
+
+            # Run the async crawler in the sync Django view
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            resp_data = loop.run_until_complete(send_via_api())
+            loop.close()
+
+            print(f"DEBUG: Pro Stealth Response: {resp_data}")
             
-            resp_data = response.json()
             if resp_data.get('status_code') == 0:
-                # Double-check if we got a real comment ID (cid)
                 cid = resp_data.get('comment', {}).get('cid')
                 if cid:
-                    return True, f"Stealth Reply Posted! (ID: {cid}) ✅"
-                return False, "Stealth Failed: TikTok accepted the request but GHOSTED the comment. Try a different Master Key."
+                    return True, f"Pro Stealth Reply Posted! (ID: {cid}) ✅"
+                return False, "Pro Stealth: Ghosted by TikTok."
                 
-            return False, f"Stealth API Error: {resp_data.get('status_msg', response.text)}"
+            return False, f"Pro Stealth Error: {resp_data.get('status_msg', 'Unknown Error')}"
+
         except Exception as e:
-            return False, f"Stealth Failed: {str(e)}"
+            return False, f"Pro Stealth Engine Failed: {str(e)}"
 
     def post_comment_reply(self, video_id, comment_id, text):
         """
