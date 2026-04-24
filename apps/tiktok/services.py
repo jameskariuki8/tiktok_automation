@@ -337,9 +337,17 @@ class TikTokApiService:
         
         try:
             response = requests.post(url, data=data, headers=headers)
-            if response.status_code == 200 and '"status_code":0' in response.text:
-                return True, "Stealth Reply Posted! ✅"
-            return False, f"Stealth Error: {response.text}"
+            print(f"DEBUG: Stealth Response: {response.text}")
+            
+            resp_data = response.json()
+            if resp_data.get('status_code') == 0:
+                # Double-check if we got a real comment ID (cid)
+                cid = resp_data.get('comment', {}).get('cid')
+                if cid:
+                    return True, f"Stealth Reply Posted! (ID: {cid}) ✅"
+                return False, "Stealth Failed: TikTok accepted the request but GHOSTED the comment. Try a different Master Key."
+                
+            return False, f"Stealth API Error: {resp_data.get('status_msg', response.text)}"
         except Exception as e:
             return False, f"Stealth Failed: {str(e)}"
 

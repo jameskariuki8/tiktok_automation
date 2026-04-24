@@ -288,9 +288,13 @@
         const input = document.getElementById('stealth-token-input');
         const token = input.value.trim();
         
-        if (!token) {
-            alert('Please paste a sessionid first!');
-            return;
+        if (!token.toLowerCase().includes('sessionid=')) {
+            if (token.length < 50) {
+                 // It's probably just the ID, we'll wrap it later
+            } else {
+                 alert('⚠️ Warning: Your Master Key is missing "sessionid". Please ensure you copied the FULL cookie string!');
+                 return;
+            }
         }
 
         try {
