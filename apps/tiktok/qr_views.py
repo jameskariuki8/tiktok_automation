@@ -27,10 +27,7 @@ class TikTokQRLoginView(APIView):
             await page.goto("https://www.tiktok.com/login/auth-platform-code/qr")
             
             try:
-                # Optimized for the Auth-Platform-Code flow
                 await page.wait_for_load_state("networkidle")
-                
-                # Check for multiple possible QR selectors
                 qr_selectors = ['canvas', 'img[src*="qrcode"]', '.tiktok-qr-code-png']
                 qr_element = None
                 
@@ -47,18 +44,17 @@ class TikTokQRLoginView(APIView):
                 image_bytes = await qr_element.screenshot()
                 qr_base64 = base64.b64encode(image_bytes).decode('utf-8')
                 
-                # Poll for up to 45 seconds (Safe for Railway)
-                for _ in range(45):
+                # Start a separate loop for polling that doesn't block the HTTP response if needed?
+                # Actually, if we increase Gunicorn timeout to 120 and loop for 90s, we are safe.
+                for _ in range(90): 
                     cookies = await context.cookies()
                     cookies_dict = {c['name']: c['value'] for c in cookies}
                     
                     if "sessionid" in cookies_dict:
-                        # Success! Save the full cookie wall
+                        # Success!
                         cookie_wall = "; ".join([f"{c['name']}={c['value']}" for c in cookies])
                         account = TikTokAccount.objects.filter(user=user).first()
-                        if not account:
-                            account = TikTokAccount(user=user)
-                        
+                        if not account: account = TikTokAccount(user=user)
                         account.stealth_token = cookie_wall
                         account.is_active = True
                         account.save()
@@ -73,9 +69,12 @@ class TikTokQRLoginView(APIView):
                 await browser.close()
 
     def get(self, request):
+        # We need a fresh loop for each sync Gunicorn worker call
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        status, qr_image = loop.run_until_complete(self.get_qr_data(request.user))
-        loop.close()
-        
-        return JsonResponse({'status': status, 'qr_code': qr_image})
+        try:
+            # We will wait for 90s. We MUST ensure Gunicorn is set to > 90s.
+            status, qr_image = loop.run_until_complete(self.get_qr_data(request.user))
+            return JsonResponse({'status': status, 'qr_code': qr_image})
+        finally:
+            loop.close()
