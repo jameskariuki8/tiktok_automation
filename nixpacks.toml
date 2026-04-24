@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python", "google-chrome", "playwright-driver.browsers"]
+nixPkgs = ["python", "playwright-driver.browsers", "glib", "nss", "nspr", "atk", "at-spi2-atk", "libdrm", "mesa", "dbus", "libxkbcommon", "pango", "cairo", "expat"]
 
 [phases.install]
 cmds = ["pip install -r requirements.txt", "PLAYWRIGHT_BROWSERS_PATH=/app/.cache playwright install chromium"]
