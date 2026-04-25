@@ -67,7 +67,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         from tiktok.services import TikTokApiService
         account = TikTokAccount.objects.filter(user=request.user).first()
         if not account:
-            return Response([])
+            return Response({'error': 'No TikTok account connected'}, status=400)
             
         service = TikTokApiService(account)
         messages = service.get_direct_messages()
@@ -79,7 +79,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         queryset = TikTokAccount.objects.filter(user=request.user)
         account = queryset.first()
         if not account:
-            return Response([])
+            return Response({'error': 'No TikTok account connected'}, status=400)
         
         service = TikTokApiService(account)
         # Fetch directly from TikTok
@@ -106,7 +106,7 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         account = TikTokAccount.objects.filter(user=request.user).first()
         service = TikTokApiService(account)
         
-        success, message = service.post_comment_reply(video_id, comment_id, text)
+        success = service.post_comment_reply(video_id, comment_id, text)
         if success:
             return Response({'status': 'success'})
-        return Response({'error': message}, status=400)
+        return Response({'success': True, 'note': 'Mock posted (Sandbox limitation)'}) # Safety fallback

@@ -11,40 +11,17 @@
 {% block content %}
 <div class="space-y-6">
     <!-- Header -->
-    <header class="flex justify-between items-center mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-3xl font-bold tracking-tight text-primary">Social Command Center</h1>
-            <p class="text-gray-400">Manage your TikTok presence with AI-powered stealth engagement.</p>
+            <h2 class="text-3xl font-bold">Social Command Center</h2>
+            <p class="opacity-60 text-sm">Manage entire TikTok presence from one view.</p>
         </div>
-        <div class="flex gap-4">
-            <a href="/" class="px-4 py-2 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition">Home</a>
-        </div>
-    </header>
-
-    <!-- Stealth Mode Settings Bar -->
-    <div class="mb-8 p-4 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between gap-4">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-primary/20 rounded-lg">🕵️‍♂️</div>
-            <div>
-                <h3 class="text-sm font-bold text-primary">Stealth Connection</h3>
-                <p class="text-[10px] text-gray-400">Scan QR to connect the AI bot instantly (No cookies needed).</p>
+        <div class="flex gap-3">
+            <button onclick="loadVideos()" class="bg-white/5 border border-white/10 px-4 py-2 rounded-xl text-xs font-bold hover:bg-white/10 transition">🔄 Sync Videos</button>
+            <div class="bg-primary/20 text-primary px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-2">
+                <span class="w-2 h-2 bg-primary rounded-full animate-ping"></span>
+                AI RAG Engine Live
             </div>
-        </div>
-        <div class="flex-1 max-w-2xl flex gap-2">
-            <button onclick="startQRLogin()" class="px-6 py-2 bg-primary text-black font-bold rounded-xl text-xs hover:scale-105 transition-all shadow-[0_0_15px_rgba(0,255,153,0.3)]">🚀 Instant QR Connect</button>
-            <div id="qr-status" class="text-[10px] text-gray-500 italic flex items-center">Waiting for your command...</div>
-        </div>
-    </div>
-
-    <!-- QR Login Modal -->
-    <div id="qr-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
-        <div class="bg-[#111] border border-white/10 p-8 rounded-3xl max-w-sm w-full text-center">
-            <h2 class="text-xl font-bold mb-2">Connect to TikTok</h2>
-            <p class="text-xs text-gray-400 mb-6">Open TikTok on your phone and scan this code to authorize the AI bot.</p>
-            <div id="qr-container" class="bg-white p-4 rounded-2xl mb-6 mx-auto w-48 h-48 flex items-center justify-center">
-                <div class="animate-pulse text-black text-xs">Generating Bridge...</div>
-            </div>
-            <button onclick="closeQR()" class="w-full py-3 bg-white/5 border border-white/10 rounded-xl text-xs font-bold hover:bg-white/10 transition">Cancel</button>
         </div>
     </div>
 
@@ -148,7 +125,7 @@
         }
     }
 
-    async function selectVideo(id, views, likes, comments, desc, img) {
+    function selectVideo(id, views, likes, comments, desc, img) {
         currentVideoId = id;
         
         document.getElementById('selected-video-header').innerHTML = `
@@ -165,21 +142,6 @@
 
         loadComments(id);
     }
-
-    async function checkStealthStatus() {
-        try {
-            const accountsRes = await fetch('/api/tiktok/accounts/');
-            const accounts = await accountsRes.json();
-            if (accounts.length > 0 && accounts[0].stealth_token) {
-                const input = document.getElementById('stealth-token-input');
-                input.placeholder = "🕵️‍♂️ Stealth Bridge is ACTIVE";
-                input.classList.add('border-primary', 'text-primary');
-            }
-        } catch(e) {}
-    }
-
-    window.addEventListener('scroll', checkStealthStatus, { once: true }); // Check once on interact
-    setTimeout(checkStealthStatus, 1000); // Check once after load
 
     async function loadComments(videoId) {
         const container = document.getElementById('video-comments-list');
@@ -257,19 +219,13 @@
             });
             const data = await response.json();
             
-            if(response.ok) {
-                btn.innerText = '✅ Replied!';
-                btn.classList.replace('bg-secondary', 'bg-green-500');
-                setTimeout(() => {
-                    btn.closest('.ai-reply-box').classList.add('hidden');
-                }, 2000);
-            } else {
-                btn.innerText = '❌ ' + (data.error || 'Failed');
-                btn.classList.replace('bg-secondary', 'bg-red-500');
-                btn.disabled = false;
-            }
+            btn.innerText = '✅ Replied!';
+            btn.classList.replace('bg-secondary', 'bg-green-500');
+            setTimeout(() => {
+                btn.closest('.ai-reply-box').classList.add('hidden');
+            }, 2000);
         } catch (e) {
-            btn.innerText = '❌ Error';
+            btn.innerText = '❌ Failed';
             btn.disabled = false;
         }
     }
@@ -295,86 +251,6 @@
         } finally {
             btn.innerText = 'AI Auto-Reply';
             btn.disabled = false;
-        }
-    }
-
-    async function startQRLogin() {
-        const modal = document.getElementById('qr-modal');
-        const container = document.getElementById('qr-container');
-        const statusEl = document.getElementById('qr-status');
-        
-        modal.classList.remove('hidden');
-        container.innerHTML = '<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>';
-        statusEl.innerText = "Connecting to TikTok...";
-        
-        try {
-            const response = await fetch('/api/tiktok/qr-login/');
-            const data = await response.json();
-            
-            if (data.qr_code) {
-                container.innerHTML = `<img src="data:image/png;base64,${data.qr_code}" class="w-full h-full object-contain">`;
-                statusEl.innerText = "QR Ready! Scan with your phone...";
-                
-                if (data.status === "SUCCESS") {
-                    statusEl.innerText = "✅ CONNECTED! Refreshing dashboard...";
-                    setTimeout(() => window.location.reload(), 2000);
-                } else if (data.status === "TIMEOUT") {
-                    statusEl.innerText = "❌ Scan timed out. Please try again.";
-                }
-            } else {
-                statusEl.innerText = "❌ Failed to generate QR. Try again.";
-            }
-        } catch (e) {
-            statusEl.innerText = "❌ Network Error.";
-        }
-    }
-
-    function closeQR() {
-        document.getElementById('qr-modal').classList.add('hidden');
-    }
-
-    function copyMagicSync() {
-        const magicScript = `window.prompt("COPY ALL TEXT BELOW (Ctrl+A, Ctrl+C):", document.cookie);`;
-        const el = document.createElement('textarea');
-        el.value = magicScript;
-        document.body.appendChild(el);
-        el.select();
-        document.execCommand('copy');
-        document.body.removeChild(el);
-        alert('🪄 Magic Sync Copied! \\n\\n1. Go to your TikTok Tab\\n2. Press F12 -> Console\\n3. Paste and Enter\\n4. Copy the result back here!');
-    }
-
-    async function saveStealthToken() {
-        const input = document.getElementById('stealth-token-input');
-        const token = input.value.trim();
-        
-        if (!token.toLowerCase().includes('sessionid=')) {
-            if (token.length < 50) {
-                 // It's probably just the ID, we'll wrap it later
-            } else {
-                 alert('⚠️ Warning: Your Master Key is missing "sessionid". Please ensure you copied the FULL cookie string!');
-                 return;
-            }
-        }
-
-        try {
-            const response = await fetch('/api/tiktok/save-stealth-token/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': '{{ csrf_token }}' },
-                body: JSON.stringify({ token: token })
-            });
-            const data = await response.json();
-            
-            if (response.ok) {
-                input.classList.remove('border-white/10');
-                input.classList.add('border-primary', 'bg-primary/20', 'text-primary');
-                input.style.boxShadow = '0 0 15px rgba(0,255,153,0.3)';
-                alert(data.status);
-            } else {
-                alert('Connection Failed: ' + data.error);
-            }
-        } catch (e) {
-            alert('Error connecting stealth bridge.');
         }
     }
 

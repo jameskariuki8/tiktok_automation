@@ -3,48 +3,18 @@
 {% block title %}Dashboard - TikTok AI{% endblock %}
 
 {% block content %}
-{% if not user.tiktok_accounts.all %}
-    <!-- Hero Connection State -->
-    <div class="glass p-12 rounded-3xl text-center max-w-2xl mx-auto my-12 border-primary/20 shadow-2xl shadow-primary/5">
-        <div class="w-24 h-24 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-8 animate-pulse shadow-lg shadow-primary/20">
-            <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
-        </div>
-        <h2 class="text-4xl font-black mb-4 bg-clip-text text-transparent bg-gradient-to-r from-white to-white/60">Connect Your TikTok</h2>
-        <p class="text-white/60 mb-10 text-lg leading-relaxed">Your AI-powered Social Command Center is ready. Connect your account now to unlock real-time analytics, AI content generation, and stealth automation.</p>
-        
-        <div class="flex flex-col md:flex-row gap-4 justify-center">
-            <button onclick="startQRLogin()" class="bg-primary text-dark px-10 py-4 rounded-2xl font-black text-lg hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20 flex items-center justify-center gap-3">
-                <span class="text-2xl">🪄</span> Instant QR Connect
-            </button>
-            <a href="{% url 'tiktok-login' %}" class="bg-white/5 border border-white/10 text-white px-10 py-4 rounded-2xl font-bold hover:bg-white/10 transition-all flex items-center justify-center gap-2">
-                Official OAuth
-            </a>
-        </div>
-        <p class="mt-8 text-[10px] uppercase tracking-[0.2em] font-bold text-white/30">Secure SSL Encryption • Official TikTok API Integration</p>
-    </div>
-
-    <!-- Hidden QR Modal -->
-    <div id="qr-modal" class="fixed inset-0 bg-dark/95 backdrop-blur-xl z-[100] hidden flex items-center justify-center p-4">
-        <div class="glass max-w-md w-full p-8 rounded-[3rem] border-primary/20 text-center relative">
-            <button onclick="closeQR()" class="absolute top-6 right-6 text-white/40 hover:text-white transition-all">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-            <h3 class="text-2xl font-black mb-2">Instant Connection</h3>
-            <p id="qr-status" class="text-sm text-primary font-bold mb-6 italic animate-pulse">Initializing engine...</p>
-            <div id="qr-container" class="aspect-square bg-white w-64 h-64 mx-auto rounded-3xl p-4 flex items-center justify-center shadow-2xl shadow-primary/10 overflow-hidden border-4 border-primary/20">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-            <p class="mt-8 text-xs text-white/60 leading-relaxed italic">"Open TikTok App > Profile > Menu > My QR Code > Scan Icon"</p>
-        </div>
-    </div>
-{% else %}
-    <!-- Connected State Dashboard -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Quick Stats -->
-        <div class="glass p-6 rounded-2xl col-span-1 md:col-span-3">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-2xl font-bold">Welcome back, {{ user.username }}!</h2>
-                <div id="tiktok-status">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Quick Stats -->
+    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-3">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold">Welcome back, {{ user.username }}!</h2>
+            <div id="tiktok-status">
+                {% if not user.tiktok_accounts.all %}
+                    <a href="{% url 'tiktok-login' %}" class="bg-primary text-white hover:bg-opacity-80 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
+                        Connect TikTok
+                    </a>
+                {% else %}
                     <div class="flex items-center gap-4">
                         <span class="text-green-400 text-sm font-bold flex items-center gap-2">
                             <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
@@ -52,109 +22,74 @@
                         </span>
                         <a href="{% url 'tiktok-disconnect' %}" class="text-[10px] text-white/40 hover:text-red-400 uppercase font-bold tracking-widest transition">Disconnect</a>
                     </div>
-                </div>
-            </div>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="text-sm opacity-60">Total Followers</p>
-                    <p class="text-2xl font-bold">{{ analytics.follower_count|default:"0" }}</p>
-                    <p class="text-xs text-green-400">Live data</p>
-                </div>
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="text-sm opacity-60">Total Likes</p>
-                    <p class="text-2xl font-bold">{{ analytics.likes_count|default:"0" }}</p>
-                    <p class="text-xs text-green-400">Total reach</p>
-                </div>
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="text-sm opacity-60">Total Videos</p>
-                    <p class="text-2xl font-bold">{{ analytics.video_count|default:"0" }}</p>
-                    <p class="text-xs text-secondary">Content library</p>
-                </div>
-                <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                    <p class="text-sm opacity-60">AI Credits</p>
-                    <p class="text-2xl font-bold">{{ user.ai_credits }}</p>
-                    <p class="text-xs opacity-50">Refills in 5 days</p>
-                </div>
+                {% endif %}
             </div>
         </div>
-
-        <!-- Main Chart Placeholder -->
-        <div class="glass p-6 rounded-2xl col-span-1 md:col-span-2 min-h-[300px] flex flex-col justify-between">
-            <div>
-                <div class="flex justify-between items-center mb-6">
-                    <h3 class="font-bold">Growth Overview</h3>
-                    <select class="bg-dark/50 border border-white/10 rounded-lg text-xs px-2 py-1">
-                        <option>Last 30 Days</option>
-                        <option>Last 7 Days</option>
-                    </select>
-                </div>
-                <div class="h-48 w-full bg-white/5 rounded-lg flex items-end p-4 space-x-2">
-                    {% for i in "123456789012" %}
-                    <div class="bg-gradient-to-t from-primary to-secondary w-full rounded-t-sm" style="height: {{ forloop.counter|add:20 }}%"></div>
-                    {% endfor %}
-                </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Total Followers</p>
+                <p class="text-2xl font-bold">{{ analytics.follower_count|default:"0" }}</p>
+                <p class="text-xs text-green-400">Live data</p>
             </div>
-            <div class="flex justify-between text-[10px] opacity-40 px-2 mt-4">
-                <span>APR 10</span>
-                <span>APR 15</span>
-                <span>APR 20</span>
-                <span>APR 25</span>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Total Likes</p>
+                <p class="text-2xl font-bold">{{ analytics.likes_count|default:"0" }}</p>
+                <p class="text-xs text-green-400">Total reach</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">Total Videos</p>
+                <p class="text-2xl font-bold">{{ analytics.video_count|default:"0" }}</p>
+                <p class="text-xs text-secondary">Content library</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                <p class="text-sm opacity-60">AI Credits</p>
+                <p class="text-2xl font-bold">{{ user.ai_credits }}</p>
+                <p class="text-xs opacity-50">Refills in 5 days</p>
             </div>
         </div>
+    </div>
 
-        <!-- Suggested Actions -->
-        <div class="glass p-6 rounded-2xl col-span-1">
-            <h3 class="font-bold mb-4">AI Suggestions</h3>
-            <div class="space-y-4">
-                <div class="p-3 bg-primary/10 border border-primary/20 rounded-xl">
-                    <p class="text-xs font-bold text-primary mb-1">CONTENT IDEA</p>
-                    <p class="text-sm">"Top 5 AI tools for marketing" is trending. Create a reaction video.</p>
-                </div>
-                <div class="p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
-                    <p class="text-xs font-bold text-secondary mb-1">ENGAGEMENT</p>
-                    <p class="text-sm">You have 12 unreplied comments. Use AI to generate quick replies?</p>
-                </div>
-                <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
-                    <p class="text-xs font-bold opacity-50 mb-1">OPTIMIZATION</p>
-                    <p class="text-sm">Your last video had low retention at 0:15. Try a shorter hook next time.</p>
-                </div>
+    <!-- Main Chart Placeholder -->
+    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-2 min-h-[300px] flex flex-col justify-between">
+        <div>
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold">Growth Overview</h3>
+                <select class="bg-dark/50 border border-white/10 rounded-lg text-xs px-2 py-1">
+                    <option>Last 30 Days</option>
+                    <option>Last 7 Days</option>
+                </select>
+            </div>
+            <div class="h-48 w-full bg-white/5 rounded-lg flex items-end p-4 space-x-2">
+                {% for i in "123456789012" %}
+                <div class="bg-gradient-to-t from-primary to-secondary w-full rounded-t-sm" style="height: {{ forloop.counter|add:20 }}%"></div>
+                {% endfor %}
             </div>
         </div>
-{% endif %}
+        <div class="flex justify-between text-[10px] opacity-40 px-2 mt-4">
+            <span>APR 10</span>
+            <span>APR 15</span>
+            <span>APR 20</span>
+            <span>APR 25</span>
+        </div>
+    </div>
 
-<script>
-    async function startQRLogin() {
-        const modal = document.getElementById('qr-modal');
-        const container = document.getElementById('qr-container');
-        const statusEl = document.getElementById('qr-status');
-        
-        modal.classList.remove('hidden');
-        container.innerHTML = '<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>';
-        statusEl.innerText = "Connecting to TikTok...";
-        
-        try {
-            const response = await fetch('/api/tiktok/qr-login/');
-            const data = await response.json();
-            
-            if (data.qr_code && data.status !== "ERROR") {
-                container.innerHTML = `<img src="data:image/png;base64,${data.qr_code}" class="w-full h-full object-contain">`;
-                statusEl.innerText = "QR Ready! Scan with your phone...";
-                
-                // If it was already a success in the first poll
-                if (data.status === "SUCCESS") {
-                    statusEl.innerText = "✅ CONNECTED! Refreshing...";
-                    setTimeout(() => window.location.reload(), 2000);
-                }
-            } else {
-                statusEl.innerText = "❌ Failed: " + (data.status || "Connection Error");
-            }
-        } catch (e) {
-            statusEl.innerText = "❌ Network Error.";
-        }
-    }
-
-    function closeQR() {
-        document.getElementById('qr-modal').classList.add('hidden');
-    }
-</script>
+    <!-- Suggested Actions -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+        <h3 class="font-bold mb-4">AI Suggestions</h3>
+        <div class="space-y-4">
+            <div class="p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                <p class="text-xs font-bold text-primary mb-1">CONTENT IDEA</p>
+                <p class="text-sm">"Top 5 AI tools for marketing" is trending. Create a reaction video.</p>
+            </div>
+            <div class="p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
+                <p class="text-xs font-bold text-secondary mb-1">ENGAGEMENT</p>
+                <p class="text-sm">You have 12 unreplied comments. Use AI to generate quick replies?</p>
+            </div>
+            <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
+                <p class="text-xs font-bold opacity-50 mb-1">OPTIMIZATION</p>
+                <p class="text-sm">Your last video had low retention at 0:15. Try a shorter hook next time.</p>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -290,96 +290,30 @@ class TikTokApiService:
             print(f"Error fetching DMs: {e}")
         return []
 
-    def post_comment_reply_stealth(self, video_id, comment_id, text):
-        """
-        Pro Stealth Bridge: Uses TikTok-Api (David Teather) signatures.
-        """
-        if not self.account or not self.account.stealth_token:
-            return False, "Stealth Mode: No stealth_token (cookie) found."
-
-        try:
-            from TikTokApi import TikTokApi
-            import asyncio
-
-            async def send_via_api():
-                async with TikTokApi() as api:
-                    # Docker handles the browser path
-                    import shutil
-                    exec_path = shutil.which("chromium") or shutil.which("google-chrome")
-                    
-                    # Initialize with browser context
-                    await api.create_sessions(
-                        ms_tokens=[self.account.stealth_token], 
-                        num_sessions=1, 
-                        sleep_after=2,
-                        executable_path=exec_path,
-                        args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
-                    )
-                    
-                    # Target endpoint for publishing
-                    url = "https://www.tiktok.com/api/comment/publish/"
-                    params = {
-                        "aweme_id": video_id,
-                        "text": text,
-                        "reply_id": comment_id,
-                        "channel_id": "0",
-                        "type": "1"
-                    }
-                    
-                    # Sign and execute
-                    # The library provides a 'make_request' that handles signatures
-                    response = await api.make_request(url, params=params, method="POST")
-                    return response
-
-            # Run the async crawler in the sync Django view
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            resp_data = loop.run_until_complete(send_via_api())
-            loop.close()
-
-            print(f"DEBUG: Pro Stealth Response: {resp_data}")
-            
-            if resp_data.get('status_code') == 0:
-                cid = resp_data.get('comment', {}).get('cid')
-                if cid:
-                    return True, f"Pro Stealth Reply Posted! (ID: {cid}) ✅"
-                return False, "Pro Stealth: Ghosted by TikTok."
-                
-            return False, f"Pro Stealth Error: {resp_data.get('status_msg', 'Unknown Error')}"
-
-        except Exception as e:
-            return False, f"Pro Stealth Engine Failed: {str(e)}"
-
     def post_comment_reply(self, video_id, comment_id, text):
         """
-        Hybrid Replier: Tries Stealth Bridge first, falls back to API only if no token.
+        Post a reply to a specific comment on TikTok.
         """
-        # Re-fetch account to ensure we have the latest stealth_token from the DB
-        from .models import TikTokAccount
-        self.account = TikTokAccount.objects.filter(id=self.account.id).first()
-        
-        if self.account and self.account.stealth_token:
-            print(f"DEBUG: Using Stealth Bridge with token starting with {self.account.stealth_token[:5]}...")
-            success, msg = self.post_comment_reply_stealth(video_id, comment_id, text)
-            if success:
-                return True, msg
-            return False, f"Stealth Failed: {msg}"
-            
-        # 2. Fallback to Official API (Only if no Stealth Token)
         if not self.account:
-            return False, "No account connected"
+            return False
             
-        url = f"{self.BASE_URL}/video/comment/reply/"
+        url = f"{self.BASE_URL}/comment/reply/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
         }
-        data = {'video_id': video_id, 'comment_id': comment_id, 'text': text}
+        data = {
+            'video_id': video_id,
+            'comment_id': comment_id,
+            'text': text
+        }
         
         try:
             response = requests.post(url, json=data, headers=headers)
             if response.status_code == 200:
-                return True, "Success (Official API)"
-            return False, f"Official API restricted (404). Please ensure Stealth Token is set."
+                return True
+            else:
+                print(f"Reply Post Error: {response.text}")
         except Exception as e:
-            return False, str(e)
+            print(f"Error posting reply: {e}")
+        return False

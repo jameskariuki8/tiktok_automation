@@ -62,19 +62,9 @@ class TikTokDisconnectView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        try:
-            # Try normal delete first
-            request.user.tiktok_accounts.all().delete()
-        except:
-            # Fallback: Raw SQL to original table
-            from django.db import connection
-            with connection.cursor() as cursor:
-                try:
-                    cursor.execute("DELETE FROM tiktok_tiktokaccount WHERE user_id = %s", [request.user.id])
-                except:
-                    pass
-        
-        return redirect('/')
+        request.user.tiktok_accounts.all().delete()
+        from django.shortcuts import redirect
+        return redirect('home')
 
 class TikTokWebhookView(views.APIView):
     permission_classes = [permissions.AllowAny]
@@ -103,24 +93,3 @@ class TikTokAccountListView(views.APIView):
         accounts = TikTokAccount.objects.filter(user=request.user)
         serializer = TikTokAccountSerializer(accounts, many=True)
         return Response(serializer.data)
-
-class TikTokSaveStealthTokenView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
-
-    def post(self, request):
-        token = request.data.get('token')
-        if not token:
-            return Response({'error': 'Token is required'}, status=400)
-            
-        try:
-            account = TikTokAccount.objects.filter(user=request.user).first()
-            if not account:
-                # Create a placeholder if none exists
-                account = TikTokAccount.objects.create(user=request.user, open_id=f"stealth_{request.user.id}", display_name=request.user.username)
-            
-            account.stealth_token = token
-            account.is_active = True
-            account.save()
-            return Response({'status': 'Stealth Bridge Connected! ✅'})
-        except Exception as e:
-            return Response({'error': f'Database Sync in Progress. Please try again in 30s. ({str(e)})'}, status=503)
