@@ -25,9 +25,6 @@ class TikTokAccount(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    class Meta:
-        db_table = 'tiktok_account_v2'
-
     def __str__(self):
         return f"{self.display_name} (@{self.user.username})"
 

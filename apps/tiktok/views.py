@@ -63,23 +63,18 @@ class TikTokDisconnectView(views.APIView):
 
     def get(self, request):
         try:
+            # Try normal delete first
             request.user.tiktok_accounts.all().delete()
         except:
-            # Nuclear Fallback: If Django can't delete it (due to mission columns), 
-            # we use RAW SQL to purge the table for this user.
+            # Fallback: Raw SQL to original table
             from django.db import connection
             with connection.cursor() as cursor:
                 try:
-                    cursor.execute("DELETE FROM tiktok_account_v2 WHERE user_id = %s", [request.user.id])
+                    cursor.execute("DELETE FROM tiktok_tiktokaccount WHERE user_id = %s", [request.user.id])
                 except:
-                    # If v2 doesn't exist yet, try v1
-                    try:
-                        cursor.execute("DELETE FROM tiktok_tiktokaccount WHERE user_id = %s", [request.user.id])
-                    except:
-                        pass
+                    pass
         
-        from django.shortcuts import redirect
-        return redirect('home')
+        return redirect('/')
 
 class TikTokWebhookView(views.APIView):
     permission_classes = [permissions.AllowAny]
