@@ -36,6 +36,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir playwright
 RUN python -m playwright install chromium
 
-ENV PYTHONPATH=/app:$PYTHONPATH
+# Ensure initialization script is executable
+RUN chmod +x init_railway.sh
 
-CMD ["gunicorn", "config.wsgi", "--log-file", "-"]
+# Start using the initialization script
+CMD ["/bin/bash", "init_railway.sh"]
