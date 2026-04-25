@@ -96,48 +96,52 @@ class TikTokApiService:
 
     def get_community_list(self, type="followers", count=20):
         """
-        Discovery Engine: We find your community by looking at your most active
-        interactors (commenters/likers) from your recent content.
+        Official TikTok Audience Fetcher.
+        Pulls from the verified /follower/list and /following/list endpoints.
         """
         if not self.account: return []
         
-        # We start by getting your video feed to find who is interacting
-        data = self.get_video_list(max_count=5)
-        videos = data.get('videos', []) if isinstance(data, dict) else []
-        community = []
-        seen_users = set()
+        endpoint = "follower/list" if type == "followers" else "following/list"
+        url = f"{self.BASE_URL}/{endpoint}/?max_count={count}"
+        headers = {
+            "Authorization": f"Bearer {self.account.access_token}",
+            "Content-Type": "application/json"
+        }
+        
+        try:
+            res = requests.get(url, headers=headers, timeout=5)
+            if res.status_code == 200:
+                data = res.json().get('data', {})
+                users = data.get('followers' if type == "followers" else 'followings', [])
+                return [{
+                    "username": u.get('display_name'),
+                    "display_name": u.get('display_name'),
+                    "avatar": u.get('avatar_url') or 'https://www.gravatar.com/avatar?d=mp'
+                } for u in users]
+            else:
+                # Fallback to interaction-based discovery if API access is restricted
+                return self.get_community_discovery_fallback(type, count)
+        except:
+            return self.get_community_discovery_fallback(type, count)
 
-        # Step 1: Discover through recent comments
-        for video in videos:
-            if len(community) >= count: break
-            video_id = video.get('id')
-            # Extract commenters as real community members
-            # In a real API, we'd call comments/list. Here we use discovered interactors.
-            discovery_url = f"https://www.tiktok.com/api/comment/list/?aweme_id={video_id}&count=10"
-            try:
-                res = requests.get(discovery_url, timeout=3)
+    def get_community_discovery_fallback(self, type, count):
+        """Discovers real users who have recently interacted."""
+        # Using our recently built Interaction Engine
+        discovery = []
+        try:
+            videos = self.get_video_list(max_count=3).get('videos', [])
+            for v in videos:
+                vid = v.get('id')
+                res = requests.get(f"https://www.tiktok.com/api/comment/list/?aweme_id={vid}&count=5")
                 if res.status_code == 200:
-                    comments = res.json().get('comments', [])
-                    for c in comments:
-                        uid = c.get('user', {}).get('unique_id')
-                        if uid and uid not in seen_users:
-                            community.append({
-                                "username": uid,
-                                "display_name": c.get('user', {}).get('nickname'),
-                                "avatar": c.get('user', {}).get('avatar_thumb', {}).get('url_list', [''])[0]
-                            })
-                            seen_users.add(uid)
-            except: continue
-
-        # Step 2: Fallback to high-quality discovery if comments are quiet
-        if not community:
-            return [
-                {"username": "trending_fan", "display_name": "Active Fan", "avatar": "https://www.gravatar.com/avatar/1?d=mp"},
-                {"username": "creative_soul", "display_name": "Creator Friend", "avatar": "https://www.gravatar.com/avatar/2?d=mp"},
-                {"username": "growth_hacker", "display_name": "Pro Follower", "avatar": "https://www.gravatar.com/avatar/3?d=mp"},
-            ]
-            
-        return community[:count]
+                    for c in res.json().get('comments', []):
+                        discovery.append({
+                            "username": c.get('user', {}).get('unique_id'),
+                            "display_name": c.get('user', {}).get('nickname'),
+                            "avatar": c.get('user', {}).get('avatar_thumb', {}).get('url_list', [''])[0]
+                        })
+        except: pass
+        return discovery[:count]
 
     def get_video_list(self, cursor=0, max_count=20):
         """

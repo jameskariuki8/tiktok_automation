@@ -91,29 +91,17 @@
     </div>
 </div>
 
-<!-- Video Modal -->
-<div id="video-modal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/95 backdrop-blur-md transition-opacity duration-300 opacity-0 px-4">
-    <div class="relative w-full max-w-md aspect-[9/16]">
-        <button onclick="closePlayer()" class="absolute -top-14 right-0 text-white/40 hover:text-primary transition-all hover:scale-110 active:scale-95">
-            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-        </button>
-        <div id="player-container" class="w-full h-full bg-black rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10">
-            <!-- Loader -->
-            <div class="w-full h-full flex items-center justify-center">
-                <div class="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
     let currentTab = 'videos';
 
     async function fetchProfile() {
         try {
             const res = await fetch('/api/analytics/user_profile/');
+            if (res.status === 400) {
+                document.getElementById('profile-bio').innerHTML = '<span class="text-red-400 font-black uppercase text-[10px]">Relink TikTok Required</span>';
+                return;
+            }
             const data = await res.json();
-            
             if (data) {
                 document.getElementById('profile-avatar').src = data.avatar_url;
                 document.getElementById('profile-name').innerText = data.display_name;
@@ -130,14 +118,13 @@
     async function loadVideos() {
         const grid = document.getElementById('videos-grid');
         grid.innerHTML = '<div class="col-span-full py-40 text-center"><div class="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div><p class="text-[10px] font-black uppercase tracking-widest opacity-40">Syncing Media...</p></div>';
-        
         try {
             const res = await fetch('/api/analytics/video_list/');
             const data = await res.json();
-            
-            if (data && data.length > 0) {
-                grid.innerHTML = data.map(v => `
-                    <div onclick="playVideo('${v.video_id}')" class="aspect-[4/5] relative rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:-translate-y-1">
+            const videos = data.videos || [];
+            if (videos.length > 0) {
+                grid.innerHTML = videos.map(v => `
+                    <div id="v-${v.id}" onclick="playVideo('${v.id}', 'v-${v.id}')" class="aspect-[4/5] relative rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:scale-[1.02]">
                         <img src="${v.cover_image_url}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                         <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
                             <div class="flex items-center gap-1.5">
@@ -153,19 +140,18 @@
         } catch (e) { grid.innerHTML = '<div class="col-span-full py-20 text-center text-red-500 font-bold">Sync Error</div>'; }
     }
 
-    function playVideo(id) {
-        const modal = document.getElementById('video-modal');
-        const container = document.getElementById('player-container');
-        container.innerHTML = `<iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full h-full rounded-3xl" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>`;
-        modal.classList.remove('hidden', 'opacity-0');
-        modal.classList.add('flex', 'opacity-100');
-    }
-
-    function closePlayer() {
-        const modal = document.getElementById('video-modal');
-        document.getElementById('player-container').innerHTML = '';
-        modal.classList.add('hidden', 'opacity-0');
-        modal.classList.remove('flex', 'opacity-100');
+    function playVideo(id, elementId) {
+        const container = document.getElementById(elementId);
+        container.classList.remove('aspect-[4/5]');
+        container.classList.add('aspect-[9/16]'); 
+        container.innerHTML = `
+            <iframe src="https://www.tiktok.com/embed/v2/${id}" class="w-full h-full" frameborder="0" allowfullscreen allow="autoplay; encrypted-media"></iframe>
+            <div class="absolute top-2 right-2 z-50">
+                <button onclick="event.stopPropagation(); location.reload()" class="bg-black/50 p-2 rounded-full text-white hover:bg-primary transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+        `;
     }
 
     async function loadCommunity(type) {
