@@ -246,14 +246,18 @@ class TikTokApiService:
         import os
         file_size = os.path.getsize(video_path)
         
-        # Step 0: Mandatory Creator Info Check (Proves we are a compliant UX)
+        # Step 0: Mandatory Creator Info Check & Verification
         creator_info = self.get_creator_info()
-        max_duration = 60 # Default
-        if creator_info:
-            max_duration = creator_info.get('max_video_post_duration_sec', 60)
-            print(f"DEBUG: CREATOR COMPLIANCE CHECK | Max Duration: {max_duration}s")
+        if not creator_info:
+            return {"status": "error", "message": "Compliance Check Failed: Unable to verify account status with TikTok."}
             
-        # Step 1: Initialize the post with Mandatory Disclosures
+        # Stop if account is capped (Requirement 1b)
+        if not creator_info.get('is_content_posting_allowed', True):
+             return {"status": "error", "message": "TikTok Posting Cap: Your account cannot make more posts today."}
+             
+        max_duration = creator_info.get('max_video_post_duration_sec', 600)
+        
+        # Step 1: Initialize the post with full Required UX metadata
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -264,12 +268,16 @@ class TikTokApiService:
             "post_info": {
                 "title": caption[:50],
                 "description": caption[:150],
-                "privacy_level": "SELF_ONLY", # Required for Unaudited Apps
+                "privacy_level": "SELF_ONLY",
                 "video_ad_tag_info": {"is_ad": False},
                 "commercial_content_disclosure_setting": {
                     "is_self_promotion": False,
                     "is_third_party_promotion": False
-                }
+                },
+                # MANDATORY INTERACTIONS (Requirement 2c)
+                "allow_comment": creator_info.get('privacy_settings', {}).get('allow_comment', True),
+                "allow_duet": creator_info.get('privacy_settings', {}).get('allow_duet', True),
+                "allow_stitch": creator_info.get('privacy_settings', {}).get('allow_stitch', True)
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
@@ -283,7 +291,6 @@ class TikTokApiService:
             init_response = requests.post(init_url, headers=headers, json=init_data, timeout=20)
             init_json = init_response.json()
             
-            # Global Debugging
             if init_json.get('error', {}).get('code') != 'ok':
                 err_msg = init_json.get('error', {}).get('message', 'Unknown Error')
                 return {"status": "error", "message": f"TikTok initialization rejected: {err_msg}"}
