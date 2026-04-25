@@ -30,7 +30,7 @@ WORKDIR /app
 COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
-
+RUN pip install --no-cache-dir playwright
 RUN python -m playwright install --with-deps chromium
 
 ENV PYTHONPATH=/app:$PYTHONPATH
