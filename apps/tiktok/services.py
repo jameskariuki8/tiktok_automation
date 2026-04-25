@@ -96,27 +96,33 @@ class TikTokApiService:
 
     def get_community_list(self, type="followers", count=20):
         """
-        Stealth Bridge to fetch actual user profiles from followers/following lists.
-        TikTok web discovery internal endpoints are used as fallback.
+        Stealth Bridge to fetch actual user profiles.
+        We utilize the web-discovery engine to find real profiles.
         """
         if not self.account: return []
         
-        # In a real production app, you might use the Research API
-        # Here we simulate the list by grabbing commenters and frequent interactors 
-        # or use a direct web-discovery endpoint if we have the username.
-        results = []
+        # We target the actual discovery endpoint for the account's context
+        # This pulls users who have recently interacted or followed
+        discovery_url = f"https://www.tiktok.com/api/user/list/?type={1 if type=='following' else 2}&count={count}&id={self.account.open_id}"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36",
+            "Referer": f"https://www.tiktok.com/@{self.account.username}"
+        }
+        
         try:
-            # Note: For Sandbox mode, we use a mock-enhanced list of 'Interactors' 
-            # who are effectively your community.
-            print(f"Fetching community {type} via Stealth Bridge...")
-            return [
-                {"username": "fan_creator", "display_name": "Fan Creator", "avatar": "https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/7300/1.jpeg?x-expires=1"},
-                {"username": "tiktok_master", "display_name": "TikTok Master", "avatar": "https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/7301/1.jpeg?x-expires=1"},
-                {"username": "viral_pro", "display_name": "Viral Pro", "avatar": "https://p16-sign-va.tiktokcdn.com/tos-maliva-avt-0068/7302/1.jpeg?x-expires=1"},
-            ]
-        except:
-            pass
-        return results
+            res = requests.get(discovery_url, headers=headers, timeout=5)
+            if res.status_code == 200:
+                raw_users = res.json().get('userList', [])
+                return [{
+                    "username": u.get('user', {}).get('uniqueId'),
+                    "display_name": u.get('user', {}).get('nickname', 'Fan'),
+                    "avatar": u.get('user', {}).get('avatarThumb', 'https://www.gravatar.com/avatar?d=mp')
+                } for u in raw_users]
+        except Exception as e:
+            print(f"Community Sync Failed: {e}")
+            
+        # Fallback to people from DMs if discovery is throttled
+        return self.get_direct_messages()[:count]
 
     def get_video_list(self, cursor=0, max_count=20):
         """

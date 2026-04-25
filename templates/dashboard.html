@@ -7,89 +7,76 @@
     <div class="flex flex-col lg:flex-row gap-8">
         
         <!-- SIDEBAR: Profile & Stats -->
-        <div class="lg:w-1/3 xl:w-1/4 space-y-6">
-            <div class="glass p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
+        <div class="lg:w-1/3 xl:w-1/4 space-y-4">
+            <div class="glass p-6 rounded-[2rem] border border-white/5 relative overflow-hidden group shadow-2xl">
                 <!-- Background Glow -->
-                <div class="absolute -top-12 -right-12 w-32 h-32 bg-primary/20 blur-[60px] rounded-full transition-all group-hover:bg-primary/30"></div>
+                <div class="absolute -top-12 -right-12 w-24 h-24 bg-primary/20 blur-[50px] rounded-full transition-all group-hover:bg-primary/30"></div>
                 
                 <div class="relative z-10 text-center">
-                    <div class="relative inline-block mb-6">
+                    <div class="relative inline-block mb-4">
                         <img id="profile-avatar" src="{{ user.tiktok_accounts.first.avatar_url|default:'https://www.gravatar.com/avatar/0000?d=mp' }}" 
-                             class="w-32 h-32 rounded-full border-[6px] border-dark shadow-2xl object-cover transition-all group-hover:scale-105">
-                        <div id="verified-badge" class="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 border-4 border-dark hidden">
-                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.64.3 1.256.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
+                             class="w-24 h-24 rounded-full border-[4px] border-dark shadow-2xl object-cover transition-all group-hover:scale-105">
+                        <div id="verified-badge" class="absolute bottom-1 right-1 bg-blue-500 text-white rounded-full p-1 border-2 border-dark hidden">
+                            <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.64.3 1.256.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
                         </div>
                     </div>
 
-                    <h1 id="profile-name" class="text-3xl font-black mb-1 letter-spacing-tight">{{ user.tiktok_accounts.first.display_name|default:user.username }}</h1>
-                    <p id="profile-username" class="text-sm font-bold bg-white/5 inline-block px-3 py-1 rounded-full text-white/40 mb-8">@{{ user.tiktok_accounts.first.username|default:user.username }}</p>
+                    <h1 id="profile-name" class="text-2xl font-black mb-1 letter-spacing-tight">{{ user.tiktok_accounts.first.display_name|default:user.username }}</h1>
+                    <p id="profile-username" class="text-[10px] font-black bg-white/5 inline-block px-3 py-1 rounded-full text-white/40 mb-6">@{{ user.tiktok_accounts.first.username|default:user.username }}</p>
 
                     <!-- Profile Bio -->
-                    <div class="px-4 mb-8">
-                        <p id="profile-bio" class="text-sm opacity-60 leading-relaxed italic">
+                    <div class="px-2 mb-6">
+                        <p id="profile-bio" class="text-xs opacity-60 leading-relaxed italic">
                             "{{ user.tiktok_accounts.first.bio|default:'No bio yet.' }}"
                         </p>
                     </div>
 
                     <!-- Compact Stats -->
-                    <div class="grid grid-cols-3 gap-2 mb-8 bg-white/5 p-4 rounded-3xl border border-white/5">
+                    <div class="grid grid-cols-3 gap-1 mb-6 bg-white/5 p-3 rounded-2xl border border-white/5">
                         <div class="text-center">
-                            <span id="stat-followers" class="block text-lg font-black text-primary">{{ analytics.follower_count|default:"0" }}</span>
-                            <span class="text-[9px] uppercase tracking-tighter opacity-30 font-black">Fans</span>
+                            <span id="stat-followers" class="block text-md font-black text-primary">{{ analytics.follower_count|default:"0" }}</span>
+                            <span class="text-[8px] uppercase tracking-tighter opacity-30 font-black">Fans</span>
                         </div>
                         <div class="text-center border-x border-white/10">
-                            <span id="stat-following" class="block text-lg font-black text-secondary">{{ analytics.following_count|default:"0" }}</span>
-                            <span class="text-[9px] uppercase tracking-tighter opacity-30 font-black">Friends</span>
+                            <span id="stat-following" class="block text-md font-black text-secondary">{{ analytics.following_count|default:"0" }}</span>
+                            <span class="text-[8px] uppercase tracking-tighter opacity-30 font-black">Friends</span>
                         </div>
                         <div class="text-center">
-                            <span id="stat-likes" class="block text-lg font-black text-white">{{ analytics.likes_count|default:"0" }}</span>
-                            <span class="text-[9px] uppercase tracking-tighter opacity-30 font-black">Likes</span>
+                            <span id="stat-likes" class="block text-md font-black text-white">{{ analytics.likes_count|default:"0" }}</span>
+                            <span class="text-[8px] uppercase tracking-tighter opacity-30 font-black">Likes</span>
                         </div>
                     </div>
 
-                    <div class="space-y-3">
+                    <div class="space-y-2">
                         {% if not user.tiktok_accounts.all %}
-                            <a href="{% url 'tiktok-login' %}" class="w-full bg-primary hover:bg-opacity-80 text-black font-black py-4 rounded-2xl text-sm transition-all shadow-xl shadow-primary/20 flex justify-center items-center gap-3">
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
-                                Authenticate
+                            <a href="{% url 'tiktok-login' %}" class="w-full bg-primary hover:bg-opacity-80 text-black font-black py-3 rounded-xl text-sm transition-all shadow-xl shadow-primary/20 flex justify-center items-center gap-3">
+                                Connect TikTok
                             </a>
                         {% else %}
-                            <button onclick="fetchProfile()" class="w-full bg-white/10 hover:bg-white/20 text-white font-bold py-3 rounded-2xl text-sm transition-all border border-white/10 group">
-                                <span class="group-hover:hidden">Sync Engine</span>
-                                <span class="hidden group-hover:inline animate-pulse">Checking API...</span>
+                            <button onclick="fetchProfile()" class="w-full bg-white/10 hover:bg-white/20 text-white font-black py-3 rounded-xl text-xs transition-all border border-white/10">
+                                Sync Engine
                             </button>
-                            <a href="{% url 'tiktok-disconnect' %}" class="block text-[9px] text-white/20 hover:text-red-400 uppercase font-black tracking-[0.2em] transition">Disable Connection</a>
+                            <a href="{% url 'tiktok-disconnect' %}" class="block text-[8px] text-white/20 hover:text-red-400 uppercase font-black tracking-[0.2em] transition">Disable</a>
                         {% endif %}
                     </div>
-                </div>
-            </div>
-
-            <!-- AI Credits Card -->
-            <div class="glass p-6 rounded-[2rem] border border-white/5 flex items-center justify-between">
-                <div>
-                    <p class="text-[10px] font-black uppercase tracking-widest opacity-30 mb-1">AI Intelligence</p>
-                    <p class="text-xl font-black">{{ user.ai_credits }} <span class="text-xs opacity-40">Credits</span></p>
-                </div>
-                <div class="w-12 h-12 bg-secondary/20 rounded-2xl flex items-center justify-center text-secondary">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                 </div>
             </div>
         </div>
 
         <!-- MAIN FEED -->
         <div class="flex-1">
-            <div class="glass rounded-[3rem] border border-white/5 overflow-hidden shadow-2xl">
+            <div class="glass rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
                 <!-- Sticky Tabs Header -->
-                <div class="sticky top-0 z-50 bg-dark/80 backdrop-blur-3xl border-b border-white/5 px-8 pt-6">
-                    <div class="flex gap-10">
-                        <button onclick="switchTab('videos')" id="tab-videos" class="pb-4 text-sm font-black border-b-4 border-primary transition-all letter-spacing-widest uppercase">My Content</button>
-                        <button onclick="switchTab('followers')" id="tab-followers" class="pb-4 text-sm font-black text-white/30 border-b-4 border-transparent hover:text-white transition-all letter-spacing-widest uppercase">Followers</button>
-                        <button onclick="switchTab('following')" id="tab-following" class="pb-4 text-sm font-black text-white/30 border-b-4 border-transparent hover:text-white transition-all letter-spacing-widest uppercase">Following</button>
+                <div class="sticky top-0 z-50 bg-dark/80 backdrop-blur-3xl border-b border-white/5 px-6 pt-4">
+                    <div class="flex gap-8">
+                        <button onclick="switchTab('videos')" id="tab-videos" class="pb-3 text-xs font-black border-b-2 border-primary transition-all letter-spacing-widest uppercase">My Content</button>
+                        <button onclick="switchTab('followers')" id="tab-followers" class="pb-3 text-xs font-black text-white/30 border-b-2 border-transparent hover:text-white transition-all letter-spacing-widest uppercase">Followers</button>
+                        <button onclick="switchTab('following')" id="tab-following" class="pb-3 text-xs font-black text-white/30 border-b-2 border-transparent hover:text-white transition-all letter-spacing-widest uppercase">Following</button>
                     </div>
                 </div>
 
-                <div class="p-8">
-                    <div id="videos-grid" class="grid grid-cols-2 md:grid-cols-3 gap-6">
+                <div class="p-6">
+                    <div id="videos-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <!-- Videos load here -->
                     </div>
 
@@ -135,28 +122,20 @@
             
             if (data && data.length > 0) {
                 grid.innerHTML = data.map(v => `
-                    <div class="aspect-[9/16] relative rounded-[2rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:-translate-y-2">
+                    <div class="aspect-[4/5] relative rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:-translate-y-1">
                         <img src="${v.cover_image_url}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute inset-0 bg-gradient-to-t from-dark via-transparent to-transparent opacity-60"></div>
-                        <div class="absolute inset-0 flex flex-col justify-between p-6">
-                            <div class="flex justify-end">
-                                <div class="bg-black/40 backdrop-blur-md px-3 py-1 rounded-full border border-white/10">
-                                    <span class="text-[10px] font-black">LIVE</span>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <div class="bg-primary/20 backdrop-blur-xl p-2 rounded-xl border border-primary/30">
-                                    <svg class="w-4 h-4 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                </div>
-                                <span class="text-sm font-black text-white">${(v.view_count / 1000).toFixed(1)}K</span>
+                        <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <span class="text-xs font-black text-white">${(v.view_count / 1000).toFixed(1)}K</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
             } else {
-                grid.innerHTML = '<div class="col-span-full py-40 text-center opacity-30 italic font-medium">Empty Feed. Go Viral Now!</div>';
+                grid.innerHTML = '<div class="col-span-full py-40 text-center opacity-30 italic font-medium">Empty Feed.</div>';
             }
-        } catch (e) { grid.innerHTML = '<div class="col-span-full py-20 text-center text-red-500 font-bold uppercase tracking-widest">Core Sync Error</div>'; }
+        } catch (e) { grid.innerHTML = '<div class="col-span-full py-20 text-center text-red-500 font-bold">Sync Error</div>'; }
     }
 
     async function loadCommunity(type) {
@@ -169,26 +148,25 @@
             
             if (data && data.length > 0) {
                 container.innerHTML = data.map(u => `
-                    <div class="flex items-center justify-between p-5 bg-white/5 rounded-[2rem] border border-white/5 transition-all hover:bg-white/10 hover:scale-[1.02] active:scale-95 cursor-pointer">
-                        <div class="flex items-center gap-5">
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-[1.5rem] border border-white/5 transition-all hover:bg-white/10 hover:scale-[1.01] active:scale-95 cursor-pointer">
+                        <div class="flex items-center gap-4">
                             <div class="relative">
-                                <img src="${u.avatar}" class="w-14 h-14 rounded-2xl object-cover border border-white/10">
-                                <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-dark"></div>
+                                <img src="${u.avatar}" class="w-12 h-12 rounded-xl object-cover border border-white/10">
                             </div>
                             <div>
-                                <p class="font-black text-sm tracking-tight">${u.display_name}</p>
-                                <p class="text-[11px] opacity-40 font-bold">@${u.username}</p>
+                                <p class="font-black text-xs tracking-tight leading-none">${u.display_name}</p>
+                                <p class="text-[9px] opacity-30 font-bold mt-1">@${u.username}</p>
                             </div>
                         </div>
-                        <div class="bg-white/5 p-2 rounded-xl border border-white/10">
-                            <svg class="w-4 h-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                        <div class="bg-white/5 p-1.5 rounded-lg border border-white/10">
+                            <svg class="w-3.5 h-3.5 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
                         </div>
                     </div>
                 `).join('');
             } else {
-                container.innerHTML = '<div class="col-span-full py-40 text-center opacity-30 italic font-medium">Audience Insight Pending</div>';
+                container.innerHTML = '<div class="col-span-full py-40 text-center opacity-30 italic font-medium">No accounts found.</div>';
             }
-        } catch (e) { container.innerHTML = '<p class="col-span-full text-center text-red-500 font-bold">COMMUNICATION BREAKDOWN</p>'; }
+        } catch (e) { container.innerHTML = '<p class="col-span-full text-center text-red-500 font-bold">ERROR</p>'; }
     }
 
     function switchTab(tab) {
