@@ -25,7 +25,8 @@ class TikTokApiService:
             'response_type': 'code',
             'redirect_uri': self.redirect_uri,
             'state': secrets.token_urlsafe(16),
-            'force_auth': 1
+            'force_auth': 1,
+            'prompt': 'consent' # Explicitly force the consent screen
         }
         if code_challenge:
             params['code_challenge'] = code_challenge
@@ -36,7 +37,7 @@ class TikTokApiService:
 
     def exchange_token(self, code, user, code_verifier=None):
         """
-        Exchange authorization code for access tokens.
+        Exchange authorization code for access tokens with robust parsing.
         """
         url = f"{self.BASE_URL}/oauth/token/"
         data = {
@@ -50,23 +51,31 @@ class TikTokApiService:
             data['code_verifier'] = code_verifier
         headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         
-        response = requests.post(url, data=data, headers=headers)
-        res_data = response.json()
-        
-        if response.status_code == 200:
-            # Create or update account
-            account, created = TikTokAccount.objects.update_or_create(
-                open_id=res_data['open_id'],
-                defaults={
-                    'user': user,
-                    'access_token': res_data['access_token'],
-                    'refresh_token': res_data['refresh_token'],
-                    'expires_in': res_data['expires_in'],
-                    'refresh_expires_in': res_data['refresh_expires_in'],
-                    'display_name': 'TikTok User', # Should fetch profile info later
-                }
-            )
-            return account
+        try:
+            response = requests.post(url, data=data, headers=headers, timeout=10)
+            res_data = response.json()
+            
+            # Robust Parsing: Some versions wrap the token in a 'data' node
+            token_node = res_data.get('data',res_data) if isinstance(res_data.get('data'), dict) else res_data
+            
+            if response.status_code == 200 and 'access_token' in token_node:
+                # Create or update account
+                account, created = TikTokAccount.objects.update_or_create(
+                    open_id=token_node['open_id'],
+                    user=user, # Link to current user
+                    defaults={
+                        'access_token': token_node['access_token'],
+                        'refresh_token': token_node.get('refresh_token', ''),
+                        'expires_in': token_node.get('expires_in', 0),
+                        'refresh_expires_in': token_node.get('refresh_expires_in', 0),
+                        'display_name': token_node.get('display_name', user.username),
+                        'avatar_url': token_node.get('avatar_url', ''),
+                    }
+                return account
+        except Exception as e:
+            print(f"Token Exchange Failed: {e}")
+            return None
+        return None
         return None
 
     def get_user_info(self):
