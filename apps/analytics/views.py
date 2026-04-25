@@ -110,3 +110,22 @@ class AnalyticsViewSet(viewsets.ReadOnlyModelViewSet):
         if success:
             return Response({'status': 'success'})
         return Response({'success': True, 'note': 'Mock posted (Sandbox limitation)'}) # Safety fallback
+
+    @action(detail=False, methods=['get'])
+    def user_profile(self, request):
+        from tiktok.services import TikTokApiService
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account: return Response({'error': 'No account'}, status=400)
+        service = TikTokApiService(account)
+        data = service.get_user_info()
+        return Response(data)
+
+    @action(detail=False, methods=['get'])
+    def community(self, request):
+        type = request.query_params.get('type', 'followers')
+        from tiktok.services import TikTokApiService
+        account = TikTokAccount.objects.filter(user=request.user).first()
+        if not account: return Response({'error': 'No account'}, status=400)
+        service = TikTokApiService(account)
+        data = service.get_community_list(type=type)
+        return Response(data)

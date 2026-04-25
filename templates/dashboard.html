@@ -3,93 +3,185 @@
 {% block title %}Dashboard - TikTok AI{% endblock %}
 
 {% block content %}
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-    <!-- Quick Stats -->
-    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-3">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-2xl font-bold">Welcome back, {{ user.username }}!</h2>
-            <div id="tiktok-status">
-                {% if not user.tiktok_accounts.all %}
-                    <a href="{% url 'tiktok-login' %}" class="bg-primary text-white hover:bg-opacity-80 px-4 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
-                        Connect TikTok
-                    </a>
-                {% else %}
-                    <div class="flex items-center gap-4">
-                        <span class="text-green-400 text-sm font-bold flex items-center gap-2">
-                            <span class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                            TikTok Connected
-                        </span>
-                        <a href="{% url 'tiktok-disconnect' %}" class="text-[10px] text-white/40 hover:text-red-400 uppercase font-bold tracking-widest transition">Disconnect</a>
+<div class="max-w-4xl mx-auto">
+    <!-- TikTok Profile Header -->
+    <div class="glass overflow-hidden rounded-3xl mb-8 border border-white/5 shadow-2xl">
+        <div class="h-32 bg-gradient-to-r from-primary/20 via-secondary/20 to-primary/20 relative animate-gradient-x"></div>
+        <div class="px-8 pb-8 relative">
+            <div class="flex flex-col md:flex-row items-center md:items-end -mt-16 gap-6 mb-8">
+                <div class="relative group">
+                    <img id="profile-avatar" src="{{ user.tiktok_accounts.first.avatar_url|default:'https://www.gravatar.com/avatar/0000?d=mp' }}" 
+                         class="w-32 h-32 rounded-full border-4 border-dark object-cover shadow-2xl transition-transform group-hover:scale-105">
+                    <div id="verified-badge" class="absolute bottom-2 right-2 bg-blue-500 text-white rounded-full p-1 border-2 border-dark hidden">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.64.3 1.256.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
                     </div>
-                {% endif %}
+                </div>
+                <div class="text-center md:text-left flex-1">
+                    <h1 id="profile-name" class="text-3xl font-black mb-1">{{ user.tiktok_accounts.first.display_name|default:user.username }}</h1>
+                    <p id="profile-username" class="text-sm font-medium opacity-60 mb-2">@{{ user.tiktok_accounts.first.username|default:user.username }}</p>
+                    <button class="bg-primary hover:bg-opacity-80 text-black font-bold px-8 py-2 rounded-lg text-sm transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">Edit Profile</button>
+                </div>
             </div>
-        </div>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">Total Followers</p>
-                <p class="text-2xl font-bold">{{ analytics.follower_count|default:"0" }}</p>
-                <p class="text-xs text-green-400">Live data</p>
+
+            <!-- Stats Bar -->
+            <div class="flex justify-center md:justify-start gap-8 mb-6 border-y border-white/5 py-6">
+                <button onclick="switchTab('following')" class="text-center hover:opacity-80 transition group">
+                    <span id="stat-following" class="block text-xl font-black">{{ analytics.following_count|default:"0" }}</span>
+                    <span class="text-xs opacity-40 uppercase tracking-widest font-bold group-hover:text-secondary">Following</span>
+                </button>
+                <button onclick="switchTab('followers')" class="text-center hover:opacity-80 transition group">
+                    <span id="stat-followers" class="block text-xl font-black">{{ analytics.follower_count|default:"0" }}</span>
+                    <span class="text-xs opacity-40 uppercase tracking-widest font-bold group-hover:text-primary">Followers</span>
+                </button>
+                <div class="text-center">
+                    <span id="stat-likes" class="block text-xl font-black">{{ analytics.likes_count|default:"0" }}</span>
+                    <span class="text-xs opacity-40 uppercase tracking-widest font-bold">Likes</span>
+                </div>
             </div>
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">Total Likes</p>
-                <p class="text-2xl font-bold">{{ analytics.likes_count|default:"0" }}</p>
-                <p class="text-xs text-green-400">Total reach</p>
-            </div>
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">Total Videos</p>
-                <p class="text-2xl font-bold">{{ analytics.video_count|default:"0" }}</p>
-                <p class="text-xs text-secondary">Content library</p>
-            </div>
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
-                <p class="text-sm opacity-60">AI Credits</p>
-                <p class="text-2xl font-bold">{{ user.ai_credits }}</p>
-                <p class="text-xs opacity-50">Refills in 5 days</p>
-            </div>
+
+            <!-- Bio -->
+            <p id="profile-bio" class="text-sm opacity-80 max-w-lg mb-4 text-center md:text-left">
+                {{ user.tiktok_accounts.first.bio|default:"No bio yet." }}
+            </p>
         </div>
     </div>
 
-    <!-- Main Chart Placeholder -->
-    <div class="glass p-6 rounded-2xl col-span-1 md:col-span-2 min-h-[300px] flex flex-col justify-between">
-        <div>
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="font-bold">Growth Overview</h3>
-                <select class="bg-dark/50 border border-white/10 rounded-lg text-xs px-2 py-1">
-                    <option>Last 30 Days</option>
-                    <option>Last 7 Days</option>
-                </select>
-            </div>
-            <div class="h-48 w-full bg-white/5 rounded-lg flex items-end p-4 space-x-2">
-                {% for i in "123456789012" %}
-                <div class="bg-gradient-to-t from-primary to-secondary w-full rounded-t-sm" style="height: {{ forloop.counter|add:20 }}%"></div>
-                {% endfor %}
-            </div>
-        </div>
-        <div class="flex justify-between text-[10px] opacity-40 px-2 mt-4">
-            <span>APR 10</span>
-            <span>APR 15</span>
-            <span>APR 20</span>
-            <span>APR 25</span>
+    <!-- Content Navigator -->
+    <div class="flex gap-4 mb-6 sticky top-4 z-40 justify-center">
+        <button onclick="switchTab('videos')" id="tab-videos" class="tab-btn active bg-white/10 px-6 py-2 rounded-full font-bold text-sm border border-white/10 backdrop-blur-xl">Videos</button>
+        <button onclick="switchTab('followers')" id="tab-followers" class="tab-btn px-6 py-2 rounded-full font-bold text-sm border border-transparent opacity-50 hover:opacity-100 transition">Followers</button>
+        <button onclick="switchTab('following')" id="tab-following" class="tab-btn px-6 py-2 rounded-full font-bold text-sm border border-transparent opacity-50 hover:opacity-100 transition">Following</button>
+    </div>
+
+    <!-- Tab Content -->
+    <div id="videos-grid" class="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <!-- Videos will load here -->
+        <div class="col-span-full py-20 text-center animate-pulse">
+            <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-sm opacity-50 font-bold uppercase tracking-widest">Loading Profile Core...</p>
         </div>
     </div>
 
-    <!-- Suggested Actions -->
-    <div class="glass p-6 rounded-2xl col-span-1">
-        <h3 class="font-bold mb-4">AI Suggestions</h3>
-        <div class="space-y-4">
-            <div class="p-3 bg-primary/10 border border-primary/20 rounded-xl">
-                <p class="text-xs font-bold text-primary mb-1">CONTENT IDEA</p>
-                <p class="text-sm">"Top 5 AI tools for marketing" is trending. Create a reaction video.</p>
-            </div>
-            <div class="p-3 bg-secondary/10 border border-secondary/20 rounded-xl">
-                <p class="text-xs font-bold text-secondary mb-1">ENGAGEMENT</p>
-                <p class="text-sm">You have 12 unreplied comments. Use AI to generate quick replies?</p>
-            </div>
-            <div class="p-3 bg-white/5 border border-white/10 rounded-xl">
-                <p class="text-xs font-bold opacity-50 mb-1">OPTIMIZATION</p>
-                <p class="text-sm">Your last video had low retention at 0:15. Try a shorter hook next time.</p>
-            </div>
+    <div id="community-list" class="hidden glass p-6 rounded-3xl min-h-[400px]">
+        <div class="flex flex-col gap-4" id="community-container">
+            <!-- Followers/Following will load here -->
         </div>
     </div>
 </div>
+
+<script>
+    let currentTab = 'videos';
+
+    async function fetchProfile() {
+        try {
+            const res = await fetch('/api/analytics/user_profile/');
+            const data = await res.json();
+            
+            if (data) {
+                document.getElementById('profile-avatar').src = data.avatar_url;
+                document.getElementById('profile-name').innerText = data.display_name;
+                document.getElementById('profile-username').innerText = '@' + (data.username || data.display_name);
+                document.getElementById('profile-bio').innerText = data.bio_description || 'No bio yet.';
+                document.getElementById('stat-followers').innerText = data.follower_count || 0;
+                document.getElementById('stat-following').innerText = data.following_count || 0;
+                document.getElementById('stat-likes').innerText = data.likes_count || 0;
+                if (data.is_verified) document.getElementById('verified-badge').classList.remove('hidden');
+            }
+        } catch (e) { console.error('Profile fetch failed'); }
+    }
+
+    async function loadVideos() {
+        const grid = document.getElementById('videos-grid');
+        grid.innerHTML = '<div class="col-span-full py-20 text-center"><div class="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div></div>';
+        
+        try {
+            const res = await fetch('/api/analytics/video_list/');
+            const data = await res.json();
+            
+            if (data && data.length > 0) {
+                grid.innerHTML = data.map(v => `
+                    <div class="aspect-[9/16] relative rounded-xl overflow-hidden group cursor-pointer border border-white/5">
+                        <img src="${v.cover_image_url}" class="w-full h-full object-cover transition-transform group-hover:scale-110">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-4">
+                            <div class="flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                <span class="text-xs font-bold text-white">${(v.view_count / 1000).toFixed(1)}K</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                grid.innerHTML = '<div class="col-span-full py-20 text-center opacity-40 italic">No videos found.</div>';
+            }
+        } catch (e) { grid.innerHTML = '<div class="col-span-full py-20 text-center text-red-400">Failed to load content.</div>'; }
+    }
+
+    async function loadCommunity(type) {
+        const container = document.getElementById('community-container');
+        container.innerHTML = '<div class="py-20 text-center"><div class="w-8 h-8 border-2 border-secondary border-t-transparent rounded-full animate-spin mx-auto"></div></div>';
+        
+        try {
+            const res = await fetch(`/api/analytics/community/?type=${type}`);
+            const data = await res.json();
+            
+            if (data && data.length > 0) {
+                container.innerHTML = data.map(u => `
+                    <div class="flex items-center justify-between p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5">
+                        <div class="flex items-center gap-4">
+                            <img src="${u.avatar}" class="w-12 h-12 rounded-full object-cover border border-white/10">
+                            <div>
+                                <p class="font-bold text-sm leading-none mb-1">${u.display_name}</p>
+                                <p class="text-xs opacity-50">@${u.username}</p>
+                            </div>
+                        </div>
+                        <button class="text-[10px] bg-white/10 px-4 py-2 rounded-full font-black uppercase tracking-widest hover:bg-primary hover:text-black transition-colors">View Profile</button>
+                    </div>
+                `).join('');
+            } else {
+                container.innerHTML = '<div class="py-20 text-center opacity-40 italic">Community list is quiet today.</div>';
+            }
+        } catch (e) { container.innerHTML = '<p class="text-center text-red-400">Error fetching community.</p>'; }
+    }
+
+    function switchTab(tab) {
+        currentTab = tab;
+        
+        // UI Tabs
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active', 'bg-white/10', 'opacity-100');
+            btn.classList.add('opacity-50');
+            btn.style.borderColor = 'transparent';
+        });
+        const activeBtn = document.getElementById(`tab-${tab}`);
+        activeBtn.classList.add('active', 'bg-white/10', 'opacity-100');
+        activeBtn.style.borderColor = 'rgba(255,255,255,0.1)';
+
+        if (tab === 'videos') {
+            document.getElementById('videos-grid').classList.remove('hidden');
+            document.getElementById('community-list').classList.add('hidden');
+            loadVideos();
+        } else {
+            document.getElementById('videos-grid').classList.add('hidden');
+            document.getElementById('community-list').classList.remove('hidden');
+            loadCommunity(tab);
+        }
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+        fetchProfile();
+        loadVideos();
+    });
+</script>
+
+<style>
+    @keyframes gradient-x {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+    }
+    .animate-gradient-x {
+        background-size: 200% 200%;
+        animation: gradient-x 15s ease infinite;
+    }
+</style>
 {% endblock %}

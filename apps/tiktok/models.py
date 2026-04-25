@@ -8,7 +8,9 @@ class TikTokAccount(models.Model):
     open_id = models.CharField(max_length=255, unique=True)
     union_id = models.CharField(max_length=255, blank=True, null=True)
     display_name = models.CharField(max_length=255)
+    username = models.CharField(max_length=255, blank=True, null=True)
     avatar_url = models.URLField(blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
     
     # Auth Tokens
     access_token = models.TextField()
