@@ -96,12 +96,12 @@ class TikTokApiService:
 
     def get_community_list(self, type="followers", count=20):
         """
-        Official TikTok Audience Fetcher.
-        Pulls from the verified /follower/list and /following/list endpoints.
+        Official TikTok Audience Fetcher with deep parsing.
         """
         if not self.account: return []
         
         endpoint = "follower/list" if type == "followers" else "following/list"
+        # Correct V2 field string
         url = f"{self.BASE_URL}/{endpoint}/?max_count={count}"
         headers = {
             "Authorization": f"Bearer {self.account.access_token}",
@@ -109,17 +109,24 @@ class TikTokApiService:
         }
         
         try:
-            res = requests.get(url, headers=headers, timeout=5)
+            res = requests.get(url, headers=headers, timeout=10)
             if res.status_code == 200:
-                data = res.json().get('data', {})
-                users = data.get('followers' if type == "followers" else 'followings', [])
+                res_data = res.json()
+                data_node = res_data.get('data', {})
+                
+                # Check multiple possible keys for the user list
+                users = data_node.get('followers' if type == "followers" else 'followings')
+                if users is None:
+                    users = data_node.get('users') or res_data.get('data', [])
+                
+                if not isinstance(users, list): users = []
+                
                 return [{
-                    "username": u.get('display_name'),
-                    "display_name": u.get('display_name'),
+                    "username": u.get('display_name', 'User'),
+                    "display_name": u.get('display_name', 'TikTok User'),
                     "avatar": u.get('avatar_url') or 'https://www.gravatar.com/avatar?d=mp'
                 } for u in users]
             else:
-                # Fallback to interaction-based discovery if API access is restricted
                 return self.get_community_discovery_fallback(type, count)
         except:
             return self.get_community_discovery_fallback(type, count)
@@ -145,29 +152,35 @@ class TikTokApiService:
 
     def get_video_list(self, cursor=0, max_count=20):
         """
-        Fetch the list of videos posted by the user.
+        Fetch the list of videos. Uses multi-layer parsing to ensure
+        we catch the data even if the API structure shifts.
         """
-        if not self.account:
-            return None
+        if not self.account: return {"videos": []}
             
-        fields_str = "id,video_description,create_time,cover_image_url,share_url,duration,view_count,like_count,comment_count,share_count"
-        url = f"{self.BASE_URL}/video/list/?fields={fields_str}"
+        fields = "id,video_description,create_time,cover_image_url,share_url,duration,view_count,like_count,comment_count,share_count"
+        url = f"{self.BASE_URL}/video/list/?fields={fields}"
         
-        data = {
-            'cursor': cursor,
-            'max_count': max_count
-        }
+        payload = {'cursor': cursor, 'max_count': max_count}
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
         }
         
-        response = requests.post(url, json=data, headers=headers)
-        if response.status_code == 200:
-            return response.json().get('data', {})
-        else:
-            print(f"TikTok API Video List Error: {response.text}")
+        try:
+            response = requests.post(url, json=payload, headers=headers, timeout=10)
+            if response.status_code == 200:
+                res_data = response.json()
+                # Aggressive Parsing: Look in 'data.videos', then 'videos', then 'data' directly
+                data_node = res_data.get('data', {})
+                videos = data_node.get('videos') if isinstance(data_node, dict) else res_data.get('videos')
+                
+                if videos is None and isinstance(data_node, list):
+                    videos = data_node
+                
+                return {"videos": videos or [], "cursor": data_node.get('cursor') if isinstance(data_node, dict) else 0}
             return {"videos": [], "error": response.text}
+        except Exception as e:
+            return {"videos": [], "error": str(e)}
 
     def sync_video_analytics(self):
         """
