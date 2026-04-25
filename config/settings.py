@@ -95,9 +95,17 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database Setup
-DATABASES = {
-    'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')
-}
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': env.db('DATABASE_URL')
+    }
+    print("🚀 DATABASE: Using PostgreSQL")
+else:
+    DATABASES = {
+        'default': env.db('DATABASE_URL', default='sqlite:///db.sqlite3')
+    }
+    print("📦 DATABASE: Using SQLite")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
