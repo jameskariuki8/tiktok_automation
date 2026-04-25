@@ -17,12 +17,15 @@ class TikTokApiService:
         Generate the TikTok OAuth authorization URL with PKCE.
         """
         import urllib.parse
+        import secrets
         scopes = "user.info.basic,user.info.profile,user.info.stats,video.list,video.upload,video.publish"
         params = {
             'client_key': self.client_key,
             'scope': scopes,
             'response_type': 'code',
             'redirect_uri': self.redirect_uri,
+            'state': secrets.token_urlsafe(16),
+            'force_auth': 1
         }
         if code_challenge:
             params['code_challenge'] = code_challenge
