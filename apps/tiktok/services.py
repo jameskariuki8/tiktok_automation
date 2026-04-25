@@ -71,11 +71,11 @@ class TikTokApiService:
                         'display_name': token_node.get('display_name', user.username),
                         'avatar_url': token_node.get('avatar_url', ''),
                     }
+                )
                 return account
         except Exception as e:
             print(f"Token Exchange Failed: {e}")
             return None
-        return None
         return None
 
     def get_user_info(self):
