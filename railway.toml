@@ -1,0 +1,2 @@
+[build]
+cmd = "pip install -e . && playwright install"
