@@ -8,3 +8,10 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Databases
+*.sqlite3
+
+# Environment
+.env
+.python-version
