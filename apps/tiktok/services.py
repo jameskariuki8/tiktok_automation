@@ -102,14 +102,15 @@ class TikTokApiService:
         if not self.account: return []
         
         # We start by getting your video feed to find who is interacting
-        videos = self.get_video_list(max_count=5)
+        data = self.get_video_list(max_count=5)
+        videos = data.get('videos', []) if isinstance(data, dict) else []
         community = []
         seen_users = set()
 
         # Step 1: Discover through recent comments
         for video in videos:
             if len(community) >= count: break
-            video_id = video.get('video_id')
+            video_id = video.get('id')
             # Extract commenters as real community members
             # In a real API, we'd call comments/list. Here we use discovered interactors.
             discovery_url = f"https://www.tiktok.com/api/comment/list/?aweme_id={video_id}&count=10"
