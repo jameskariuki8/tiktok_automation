@@ -254,6 +254,8 @@ class TikTokApiService:
                 if "integration guidelines" in err_msg:
                     return {"status": "error", "message": "Sandbox Restriction: Please add your TikTok account as a 'Tester' in the TikTok Developer Console to enable posting."}
                 return {"status": "error", "message": f"TikTok initialization rejected: {err_msg}"}
+        except Exception as e:
+            return {"status": "error", "message": f"Connection Failure during initialization: {str(e)}"}
             
         data_block = init_json.get('data', {})
         upload_url = data_block.get('upload_url')
