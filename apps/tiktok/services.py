@@ -237,7 +237,7 @@ class TikTokApiService:
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json; charset=UTF-8'
         }
         
         init_data = {
@@ -253,15 +253,13 @@ class TikTokApiService:
             }
         }
         
-        print(f"DEBUG: INITIALIZING TIKTOK UPLOAD | Size: {file_size} bytes | Privacy: SELF_ONLY")
-        
         try:
-            init_response = requests.post(init_url, headers=headers, json=init_data, timeout=15)
+            init_response = requests.post(init_url, headers=headers, json=init_data, timeout=20)
             init_json = init_response.json()
             
+            # Global Debugging
             if init_json.get('error', {}).get('code') != 'ok':
                 err_msg = init_json.get('error', {}).get('message', 'Unknown Error')
-                print(f"DEBUG: TIKTOK REJECTED INIT | {err_msg}")
                 return {"status": "error", "message": f"TikTok initialization rejected: {err_msg}"}
         except Exception as e:
             return {"status": "error", "message": f"Connection Failure during initialization: {str(e)}"}
