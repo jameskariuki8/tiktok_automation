@@ -121,19 +121,28 @@
         try {
             const res = await fetch('/api/analytics/video_list/');
             const data = await res.json();
-            const videos = data.videos || [];
+            
+            // Flexible Parsing: Handle Array or Object response
+            const videos = Array.isArray(data) ? data : (data.videos || []);
+            
             if (videos.length > 0) {
-                grid.innerHTML = videos.map(v => `
-                    <div id="v-${v.id}" onclick="playVideo('${v.id}', 'v-${v.id}')" class="aspect-[4/5] relative rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:scale-[1.02]">
-                        <img src="${v.cover_image_url}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                        <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
-                            <div class="flex items-center gap-1.5">
-                                <svg class="w-3.5 h-3.5 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                                <span class="text-xs font-black text-white">${(v.view_count / 1000).toFixed(1)}K</span>
+                grid.innerHTML = videos.map(v => {
+                    const vid = v.id || v.video_id;
+                    const cover = v.cover_image_url || v.thumbnail_url;
+                    const views = v.view_count || 0;
+                    
+                    return `
+                        <div id="v-${vid}" onclick="playVideo('${vid}', 'v-${vid}')" class="aspect-[4/5] relative rounded-[1.5rem] overflow-hidden group cursor-pointer border border-white/5 shadow-xl transition-all hover:scale-[1.02]">
+                            <img src="${cover}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            <div class="absolute inset-x-0 bottom-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
+                                <div class="flex items-center gap-1.5">
+                                    <svg class="w-3.5 h-3.5 text-primary" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                                    <span class="text-xs font-black text-white">${(views / 1000).toFixed(1)}K</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } else {
                 grid.innerHTML = '<div class="col-span-full py-40 text-center opacity-30 italic font-medium">Empty Feed.</div>';
             }
