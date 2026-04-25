@@ -23,6 +23,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgbm1 \
     libnspr4 \
     libnss3 \
+    fonts-liberation \
+    fonts-noto-color-emoji \
+    fonts-unifont \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -31,7 +34,7 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install --no-cache-dir playwright
-RUN python -m playwright install --with-deps chromium
+RUN python -m playwright install chromium
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 
