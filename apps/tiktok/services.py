@@ -17,7 +17,7 @@ class TikTokApiService:
         Generate the TikTok OAuth authorization URL with PKCE.
         """
         import urllib.parse
-        scopes = "user.info.basic,user.info.profile,user.info.stats,video.list,video.publish"
+        scopes = "user.info.basic,user.info.profile,user.info.stats,video.list,video.upload,video.publish"
         params = {
             'client_key': self.client_key,
             'scope': scopes,
@@ -221,16 +221,20 @@ class TikTokApiService:
         file_size = os.path.getsize(video_path)
         
         # Step 1: Initialize the post
+        # IMPORTANT: In Sandbox mode, only 'SELF_ONLY' or 'MUTUAL_FOLLOW_FRIENDS' 
+        # is sometimes allowed depending on your account status.
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
-            'Content-Type': 'application/json; charset=UTF-8'
+            'Content-Type': 'application/json'
         }
         
         init_data = {
             "post_info": {
+                "title": caption[:50], # V2 prefers 'title' for metadata
                 "description": caption[:150],
-                "privacy_level": "SELF_ONLY"
+                "privacy_level": "PUBLIC_TO_EVERYONE", # Most universal level
+                "video_ad_tag_info": {"is_ad": False}
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
@@ -240,11 +244,16 @@ class TikTokApiService:
             }
         }
         
-        init_response = requests.post(init_url, headers=headers, json=init_data)
-        init_json = init_response.json()
-        
-        if init_json.get('error', {}).get('code') != 'ok':
-            return {"status": "error", "message": f"TikTok initialization failed: {init_json.get('error', {}).get('message')}"}
+        try:
+            init_response = requests.post(init_url, headers=headers, json=init_data, timeout=12)
+            init_json = init_response.json()
+            
+            # Check for TikTok Global Errors
+            if init_json.get('error', {}).get('code') != 'ok':
+                err_msg = init_json.get('error', {}).get('message', 'Unknown Error')
+                if "integration guidelines" in err_msg:
+                    return {"status": "error", "message": "Sandbox Restriction: Please add your TikTok account as a 'Tester' in the TikTok Developer Console to enable posting."}
+                return {"status": "error", "message": f"TikTok initialization rejected: {err_msg}"}
             
         data_block = init_json.get('data', {})
         upload_url = data_block.get('upload_url')
