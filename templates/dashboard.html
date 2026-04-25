@@ -18,8 +18,19 @@
                 </div>
                 <div class="text-center md:text-left flex-1">
                     <h1 id="profile-name" class="text-3xl font-black mb-1">{{ user.tiktok_accounts.first.display_name|default:user.username }}</h1>
-                    <p id="profile-username" class="text-sm font-medium opacity-60 mb-2">@{{ user.tiktok_accounts.first.username|default:user.username }}</p>
-                    <button class="bg-primary hover:bg-opacity-80 text-black font-bold px-8 py-2 rounded-lg text-sm transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20">Edit Profile</button>
+                    <p id="profile-username" class="text-sm font-medium opacity-60 mb-4">@{{ user.tiktok_accounts.first.username|default:user.username }}</p>
+                    
+                    <div class="flex gap-3">
+                        {% if not user.tiktok_accounts.all %}
+                            <a href="{% url 'tiktok-login' %}" class="bg-primary hover:bg-opacity-80 text-black font-bold px-8 py-2 rounded-lg text-sm transition-all transform hover:scale-105 active:scale-95 shadow-lg shadow-primary/20 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.17-2.89-.6-4.13-1.47-.13-.08-.26-.17-.38-.25v7.39c.01 1.71-.4 3.49-1.55 4.75-1.39 1.55-3.6 2.37-5.69 2.08-2.31-.22-4.47-1.78-5.38-3.95-.91-2.17-.59-4.83.99-6.6 1.45-1.63 3.84-2.32 5.92-1.74v3.91c-.81-.33-1.76-.32-2.52.19-.8.51-1.22 1.49-1.07 2.43.15.93.99 1.68 1.93 1.76 1.11.08 2.14-.59 2.49-1.63.09-.27.11-.56.11-.84V0l.22.02z"/></svg>
+                                Connect TikTok
+                            </a>
+                        {% else %}
+                            <button onclick="fetchProfile()" class="bg-white/10 hover:bg-white/20 text-white font-bold px-6 py-2 rounded-lg text-sm transition-all border border-white/10">Sync Data</button>
+                            <a href="{% url 'tiktok-disconnect' %}" class="text-[10px] text-white/40 hover:text-red-400 uppercase font-bold tracking-widest transition flex items-center">Disconnect</a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
