@@ -233,8 +233,7 @@ class TikTokApiService:
         file_size = os.path.getsize(video_path)
         
         # Step 1: Initialize the post
-        # IMPORTANT: In Sandbox mode, only 'SELF_ONLY' or 'MUTUAL_FOLLOW_FRIENDS' 
-        # is sometimes allowed depending on your account status.
+        # Minimalist init_data to avoid compliance triggers
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -243,10 +242,8 @@ class TikTokApiService:
         
         init_data = {
             "post_info": {
-                "title": caption[:50], # V2 prefers 'title' for metadata
                 "description": caption[:150],
-                "privacy_level": "PUBLIC_TO_EVERYONE", # Most universal level
-                "video_ad_tag_info": {"is_ad": False}
+                "privacy_level": "SELF_ONLY",
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
@@ -256,15 +253,15 @@ class TikTokApiService:
             }
         }
         
+        print(f"DEBUG: INITIALIZING TIKTOK UPLOAD | Size: {file_size} bytes | Privacy: SELF_ONLY")
+        
         try:
-            init_response = requests.post(init_url, headers=headers, json=init_data, timeout=12)
+            init_response = requests.post(init_url, headers=headers, json=init_data, timeout=15)
             init_json = init_response.json()
             
-            # Check for TikTok Global Errors
             if init_json.get('error', {}).get('code') != 'ok':
                 err_msg = init_json.get('error', {}).get('message', 'Unknown Error')
-                if "integration guidelines" in err_msg:
-                    return {"status": "error", "message": "Sandbox Restriction: Please add your TikTok account as a 'Tester' in the TikTok Developer Console to enable posting."}
+                print(f"DEBUG: TIKTOK REJECTED INIT | {err_msg}")
                 return {"status": "error", "message": f"TikTok initialization rejected: {err_msg}"}
         except Exception as e:
             return {"status": "error", "message": f"Connection Failure during initialization: {str(e)}"}
