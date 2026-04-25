@@ -25,6 +25,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 ALLOWED_HOSTS = ['*']
+APPEND_SLASH = False
 CSRF_TRUSTED_ORIGINS = [
     'https://tiktokautomation-production.up.railway.app',
     
