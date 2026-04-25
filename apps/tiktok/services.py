@@ -222,18 +222,38 @@ class TikTokApiService:
             )
         return True
 
+    def get_creator_info(self):
+        """
+        MANDATORY V2: Fetch creator status before posting.
+        """
+        if not self.account: return None
+        url = f"{self.BASE_URL}/post/publish/creator_info/query/"
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
+        }
+        try:
+            res = requests.post(url, headers=headers, json={}, timeout=10)
+            return res.json().get('data') if res.status_code == 200 else None
+        except: return None
+
     def upload_video(self, video_path, caption):
         """
-        Upload and publish a video to TikTok Drafts using Content Posting API v2.
+        Upload and publish a video to TikTok Drafts using Compliant V2 Handshake.
         """
-        if not self.account:
-            return None
+        if not self.account: return {"status": "error", "message": "No account"}
             
         import os
         file_size = os.path.getsize(video_path)
         
-        # Step 1: Initialize the post
-        # Minimalist init_data to avoid compliance triggers
+        # Step 0: Mandatory Creator Info Check (Proves we are a compliant UX)
+        creator_info = self.get_creator_info()
+        max_duration = 60 # Default
+        if creator_info:
+            max_duration = creator_info.get('max_video_post_duration_sec', 60)
+            print(f"DEBUG: CREATOR COMPLIANCE CHECK | Max Duration: {max_duration}s")
+            
+        # Step 1: Initialize the post with Mandatory Disclosures
         init_url = f"{self.BASE_URL}/post/publish/video/init/"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
@@ -242,8 +262,14 @@ class TikTokApiService:
         
         init_data = {
             "post_info": {
+                "title": caption[:50],
                 "description": caption[:150],
-                "privacy_level": "SELF_ONLY",
+                "privacy_level": "SELF_ONLY", # Required for Unaudited Apps
+                "video_ad_tag_info": {"is_ad": False},
+                "commercial_content_disclosure_setting": {
+                    "is_self_promotion": False,
+                    "is_third_party_promotion": False
+                }
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
