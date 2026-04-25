@@ -31,7 +31,7 @@ COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-RUN playwright install chromium
+RUN python -m playwright install --with-deps chromium
 
 ENV PYTHONPATH=/app:$PYTHONPATH
 
