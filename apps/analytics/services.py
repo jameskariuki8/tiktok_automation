@@ -22,6 +22,7 @@ class AnalyticsService:
             date=today,
             defaults={
                 'follower_count': user_info.get('follower_count', 0),
+                'following_count': user_info.get('following_count', 0),
                 'likes_count': user_info.get('likes_count', 0),
                 'video_count': user_info.get('video_count', 0)
             }
