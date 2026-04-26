@@ -60,7 +60,6 @@
             <!-- Desktop Links -->
             <div class="hidden md:flex space-x-8 text-sm font-medium">
                 <a href="{% url 'home' %}" class="hover:text-primary transition">Dashboard</a>
-                <a href="{% url 'scheduler-ui' %}" class="hover:text-primary transition">Scheduler</a>
                 <a href="{% url 'analytics-ui' %}" class="hover:text-primary transition">Analytics</a>
                 <a href="{% url 'content-ai-ui' %}" class="hover:text-primary transition">AI Content</a>
             </div>
@@ -88,7 +87,6 @@
         <!-- Mobile Sidebar Overlay -->
         <div id="mobile-menu" class="fixed inset-0 bg-dark z-40 transform translate-x-full transition-transform duration-300 md:hidden flex flex-col p-10 pt-24 space-y-6">
             <a href="{% url 'home' %}" class="text-2xl font-bold hover:text-primary transition">Dashboard</a>
-            <a href="{% url 'scheduler-ui' %}" class="text-2xl font-bold hover:text-primary transition">Scheduler</a>
             <a href="{% url 'analytics-ui' %}" class="text-2xl font-bold hover:text-primary transition">Analytics</a>
             <a href="{% url 'content-ai-ui' %}" class="text-2xl font-bold hover:text-primary transition">AI Content</a>
             <div class="pt-10 border-t border-white/10">

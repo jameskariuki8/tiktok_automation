@@ -29,10 +29,6 @@ def home(request):
     return render(request, 'base.html')
 
 @login_required
-def scheduler_view(request):
-    return render(request, 'scheduler.html')
-
-@login_required
 def analytics_view(request):
     return render(request, 'analytics.html')
 

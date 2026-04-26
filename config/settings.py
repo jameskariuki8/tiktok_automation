@@ -5459,7 +5459,6 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     'accounts',
     'tiktok',
-    'scheduler',
     'analytics',
     'comments_ai',
     'dm_ai',
