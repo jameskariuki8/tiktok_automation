@@ -47,34 +47,53 @@ class ContentAIService:
 
     def analyze_performance_and_advise(self):
         """
-        Compare top-performing vs low-performing posts and provide growth advice.
+        Deep-dive analysis by a professional-tier AI Social Media Manager.
         """
         from analytics.models import VideoAnalytics
-        from django.db.models import Avg
+        from django.db.models import Avg, Sum
         
-        # 1. Fetch metrics
-        all_stats = VideoAnalytics.objects.filter(account__user=self.user)
+        # 1. Fetch deep metrics
+        all_stats = VideoAnalytics.objects.filter(account__user=self.user).order_by('-date')
         if not all_stats.exists():
-            return "No data yet. Post more videos to get AI advice!"
+            return {
+                "summary": "Data Collection Phase",
+                "insight": "We need at least 3-5 synced posts to generate a professional roadmap. Post more videos or click 'Sync' to start.",
+                "recommendations": []
+            }
 
-        # 2. Identify patterns (simplified logic)
-        avg_likes = all_stats.aggregate(Avg('like_count'))['like_count__avg']
-        top_posts = all_stats.filter(like_count__gt=avg_likes).order_by('-like_count')[:3]
+        # 2. Pattern Recognition
+        total_engagement = all_stats.aggregate(Sum('like_count'), Sum('comment_count'), Sum('share_count'))
+        avg_views = all_stats.aggregate(Avg('view_count'))['view_count__avg']
         
-        # 3. Generate Advice via Gemini
-        context = "\n".join([f"Post Caption: {p.caption}, Likes: {p.like_count}, Views: {p.view_count}" for p in all_stats[:5]])
+        # 3. Create High-Context Prompt
+        history = []
+        for p in all_stats[:10]:
+            history.append(f"Post: {p.tiktok_video_id} | Views: {p.view_count} | Likes: {p.like_count} | Comments: {p.comment_count}")
+        
+        context = "\n".join(history)
         
         prompt = ChatPromptTemplate.from_template("""
-        You are a TikTok Growth Analyst. Here is the performance data for the last few posts:
+        You are a Senior Social Media Growth Director at a top-tier digital agency. 
+        Your mission is to provide a "Virality Roadmap" for this client.
+        
+        DATA FEED:
         {history}
         
-        Analyze which type of content is working best and provide 3 actionable tips for improvement.
-        Focus on: Hook quality, Topic engagement, and Call to action.
+        Provide your analysis in THREE DISTINCT SECTIONS:
+        1. THE WINNING FORMULA: Identify which specific post structure or topic is working and why (be specific about engagement patterns).
+        2. GROWTH FRICTION: Identify what is holding the account back (e.g. low comment-to-view ratio, missing hooks).
+        3. THE ROADMAP: Provide 3 concrete, high-impact video ideas for the next 7 days based on this data.
+        
+        Tone: Professional, authoritative, data-driven, and encouraging.
         """)
         
-        chain = prompt | self.llm
-        response = chain.invoke({"history": context})
-        return response.content
+        try:
+            chain = prompt | self.llm
+            response = chain.invoke({"history": context})
+            return response.content
+        except Exception as e:
+            logger.error(f"AI Analysis Failed: {e}")
+            return "The AI consultant is currently in a strategy meeting. Try again in 5 minutes."
 
     def generate_caption_for_video(self, video_topic):
         """

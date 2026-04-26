@@ -1,26 +1,152 @@
 {% extends 'base.html' %}
-{% block title %}AI Content Optimizer - TikTok AI{% endblock %}
+{% block title %}AI Virality Roadmap - Smart TikTok{% endblock %}
+
+{% block extra_head %}
+<style>
+    .ai-gradient-text {
+        background: linear-gradient(135deg, #ff0050 0%, #00f2ea 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .report-card { border: 1px solid rgba(255, 255, 255, 0.05); }
+    .report-card:hover { border-color: rgba(0, 242, 234, 0.3); }
+    .roadmap-section p { line-height: 1.8; opacity: 0.8; font-size: 0.9rem; }
+    .roadmap-section h3 { margin-top: 1.5rem; margin-bottom: 0.75rem; color: #00f2ea; font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="glass p-8 rounded-3xl">
-    <h2 class="text-3xl font-bold mb-6">AI Content Strategy</h2>
-    <div class="max-w-2xl">
-        <label class="block text-sm font-medium mb-2">What is your video niche?</label>
-        <div class="flex space-x-2">
-            <input type="text" placeholder="e.g. AI Tutorials" class="flex-1 bg-dark/50 border border-white/10 rounded-xl px-4 py-2">
-            <button class="bg-gradient-to-tr from-primary to-secondary px-6 rounded-xl font-bold">Generate</button>
-        </div>
-    </div>
+<div class="max-w-6xl mx-auto space-y-8 pb-20">
     
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="space-y-4">
-            <h3 class="font-bold">Latest Ideas</h3>
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">3 DIY AI hacks you need to know</div>
-            <div class="p-4 bg-white/5 rounded-xl border border-white/10">Why your AI scripts look like robots</div>
+    <!-- HEADER SECTION -->
+    <div class="flex flex-col md:flex-row justify-between items-end gap-6">
+        <div class="space-y-2">
+            <h1 class="text-4xl font-black tracking-tighter">AI <span class="ai-gradient-text">STRATEGY</span> DIRECTOR</h1>
+            <p class="opacity-50 text-sm uppercase font-bold tracking-widest">Real-time Performance Auditing & Virality Prediction</p>
         </div>
-        <div class="space-y-4">
-            <h3 class="font-bold">Optimal Times</h3>
-            <div class="p-4 bg-secondary/10 border border-secondary/20 rounded-xl">Today at 6:45 PM (High impact)</div>
-        </div>
+        <button onclick="generateReport()" id="report-btn" class="bg-white text-black font-black px-8 py-4 rounded-2xl hover:scale-105 transition-all shadow-2xl shadow-white/10 flex items-center gap-3">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+             Run Professional Audit
+        </button>
     </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- COLUMN 1: ACCOUNT HEALTH -->
+        <div class="md:col-span-1 space-y-6">
+            <div class="glass p-8 rounded-[2rem] border border-white/5 relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <svg class="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+                </div>
+                <h3 class="text-xs font-black uppercase text-secondary mb-6 tracking-widest">Engagement Velocity</h3>
+                <div class="space-y-4">
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <p class="text-[10px] opacity-40 font-bold uppercase mb-1">Growth Score</p>
+                        <div class="flex items-end gap-2">
+                            <span class="text-3xl font-black">84</span>
+                            <span class="text-green-400 text-xs font-bold mb-1">↗ 12%</span>
+                        </div>
+                    </div>
+                    <div class="bg-white/5 p-4 rounded-2xl border border-white/5">
+                        <p class="text-[10px] opacity-40 font-bold uppercase mb-1">Virality Index</p>
+                        <div class="h-2 bg-white/10 rounded-full mt-2 overflow-hidden">
+                            <div class="w-3/4 h-full bg-gradient-to-r from-primary to-secondary"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- QUICK IDEA GENERATOR -->
+            <div class="glass p-8 rounded-[2rem] border border-white/5">
+                <h3 class="text-xs font-black uppercase text-primary mb-6 tracking-widest">Instant Idea Factory</h3>
+                <input type="text" id="niche-input" placeholder="Enter your niche..." class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-primary transition">
+                <button onclick="generateIdea()" class="w-full bg-white/5 hover:bg-white/10 border border-white/10 py-3 rounded-xl text-xs font-black transition">GENERATE SCRIPT</button>
+            </div>
+        </div>
+
+        <!-- COLUMN 2-3: THE VIRALITY ROADMAP (PROFESSIONAL REPORT) -->
+        <div class="md:col-span-2">
+            <div class="glass min-h-full rounded-[2rem] border border-white/5 relative overflow-hidden flex flex-col">
+                <div class="bg-white/5 border-b border-white/5 px-8 py-6 flex justify-between items-center">
+                    <h3 class="text-xs font-black uppercase tracking-widest opacity-60">Professional Roadmapping Engine</h3>
+                    <div class="flex gap-2">
+                        <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                        <span class="text-[10px] uppercase font-black opacity-40">Gemini 1.5 Optimized</span>
+                    </div>
+                </div>
+                
+                <div id="report-content" class="p-8 flex-1 roadmap-section">
+                    <!-- INITIAL STATE -->
+                    <div class="flex flex-col items-center justify-center py-40 text-center space-y-6">
+                        <div class="p-6 bg-white/5 rounded-full border border-white/5">
+                             <svg class="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        </div>
+                        <div class="space-y-2">
+                            <h2 class="text-xl font-bold opacity-60">Ready for Strategy?</h2>
+                            <p class="max-w-xs mx-auto text-xs opacity-30">Click "Run Professional Audit" to start the AI analysis of your recent content performance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="loading-report" class="hidden p-8 flex-1 flex flex-col items-center justify-center space-y-4">
+                     <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                     <p class="text-[10px] font-black uppercase tracking-[0.3em] opacity-40">Mining View Data...</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
 </div>
+
+<script>
+    async function generateReport() {
+        const btn = document.getElementById('report-btn');
+        const content = document.getElementById('report-content');
+        const loader = document.getElementById('loading-report');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<div class="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></div> Executive Audit...';
+        content.classList.add('hidden');
+        loader.classList.remove('hidden');
+
+        try {
+            const res = await fetch('/api/content-ai/performance_advice/');
+            const data = await res.json();
+            
+            // Format the Markdown-style response into clean HTML
+            const html = data.advice
+                .replace(/### (.*)/g, '<h3>$1</h3>')
+                .replace(/\* \*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/\n\n/g, '<div class="mb-6"></div>')
+                .replace(/\n/g, '<br>');
+
+            content.innerHTML = `
+                <div class="animate-in fade-in slide-in-from-bottom-4 duration-1000">
+                    <div class="flex items-center gap-4 mb-10 pb-6 border-b border-white/5">
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-primary to-secondary flex items-center justify-center font-black text-black">DR</div>
+                        <div>
+                             <p class="text-lg font-black tracking-tight">Q2 Growth Directive</p>
+                             <p class="text-[10px] opacity-40 uppercase font-black">Generated at ${new Date().toLocaleTimeString()}</p>
+                        </div>
+                    </div>
+                    ${html}
+                </div>
+            `;
+        } catch (e) {
+            content.innerHTML = '<p class="text-red-500 font-bold">Audit engine failed. Check connection.</p>';
+        } finally {
+            content.classList.remove('hidden');
+            loader.classList.add('hidden');
+            btn.disabled = false;
+            btn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Run Professional Audit';
+        }
+    }
+
+    async function generateIdea() {
+        const niche = document.getElementById('niche-input').value || 'Business';
+        alert(`Generating script for ${niche}... Check console for output (In-dev feature)`);
+    }
+</script>
 {% endblock %}
