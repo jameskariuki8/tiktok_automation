@@ -85,7 +85,7 @@ class TikTokApiService:
         if not self.account:
             return None
             
-        url = f"{self.BASE_URL}/user/info/"
+        url = f"{self.BASE_URL}/user/info"
         params = {
             'fields': 'display_name,username,avatar_url,bio_description,is_verified,follower_count,following_count,likes_count,video_count'
         }
@@ -114,7 +114,7 @@ class TikTokApiService:
         
         endpoint = "follower/list" if type == "followers" else "following/list"
         # Correct V2 field string
-        url = f"{self.BASE_URL}/{endpoint}/?max_count={count}"
+        url = f"{self.BASE_URL}/{endpoint}?max_count={count}"
         headers = {
             "Authorization": f"Bearer {self.account.access_token}",
             "Content-Type": "application/json"
@@ -227,7 +227,7 @@ class TikTokApiService:
         MANDATORY V2: Fetch creator status before posting.
         """
         if not self.account: return None
-        url = f"{self.BASE_URL}/post/publish/creator_info/query/"
+        url = f"{self.BASE_URL}/post/publish/creator_info/query"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
@@ -262,7 +262,7 @@ class TikTokApiService:
         # Adding a placeholder loop for future binary-level duration check.
 
         # Step 1: Initialize the post with full Required metadata (Requirement 2 & 3)
-        init_url = f"{self.BASE_URL}/post/publish/video/init/"
+        init_url = f"{self.BASE_URL}/post/publish/video/init"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json; charset=UTF-8'
@@ -381,7 +381,7 @@ class TikTokApiService:
         if not self.account:
             return []
             
-        url = f"{self.BASE_URL}/im/conversation/list/"
+        url = f"{self.BASE_URL}/im/conversation/list"
         headers = {
             'Authorization': f"Bearer {self.account.access_token}",
             'Content-Type': 'application/json'
