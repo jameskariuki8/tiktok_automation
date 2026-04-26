@@ -9,7 +9,7 @@ class TikTokAccount(models.Model):
     union_id = models.CharField(max_length=255, blank=True, null=True)
     display_name = models.CharField(max_length=255)
     username = models.CharField(max_length=255, blank=True, null=True)
-    avatar_url = models.URLField(blank=True, null=True)
+    avatar_url = models.URLField(max_length=1000, blank=True, null=True)
     bio = models.TextField(blank=True, null=True)
     
     # Auth Tokens
