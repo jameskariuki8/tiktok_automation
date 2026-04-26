@@ -82,10 +82,10 @@ class TikTokApiService:
         """
         Fetch profile and stats from TikTok User Info endpoint.
         """
-        if not self.account:
-            return None
+        if not self.account: return None
             
         url = f"{self.BASE_URL}/user/info"
+        # Standard V2 Fields
         params = {
             'fields': 'display_name,username,avatar_url,bio_description,is_verified,follower_count,following_count,likes_count,video_count'
         }
@@ -93,17 +93,18 @@ class TikTokApiService:
         
         try:
             response = requests.get(url, params=params, headers=headers)
+            print(f"🕵️‍♂️ USER_INFO RES ({response.status_code}): {response.text}")
             if response.status_code == 200:
                 user_data = response.json().get('data', {}).get('user', {})
-                # Cache to model
-                self.account.display_name = user_data.get('display_name', self.account.display_name)
-                self.account.username = user_data.get('username', self.account.username) or user_data.get('display_name')
-                self.account.avatar_url = user_data.get('avatar_url', self.account.avatar_url)
-                self.account.bio = user_data.get('bio_description', self.account.bio)
-                self.account.save()
+                if user_data:
+                    self.account.display_name = user_data.get('display_name', self.account.display_name)
+                    self.account.username = user_data.get('username', self.account.username)
+                    self.account.avatar_url = user_data.get('avatar_url', self.account.avatar_url)
+                    self.account.bio = user_data.get('bio_description', self.account.bio)
+                    self.account.save()
                 return user_data
         except Exception as e:
-            print(f"User Info Error: {e}")
+            print(f"❌ USER_INFO EXCEPTION: {e}")
         return None
 
     def get_community_list(self, type="followers", count=20):
@@ -234,8 +235,13 @@ class TikTokApiService:
         }
         try:
             res = requests.post(url, headers=headers, json={}, timeout=10)
-            return res.json().get('data') if res.status_code == 200 else None
-        except: return None
+            print(f"🕵️‍♂️ CREATOR_INFO RES ({res.status_code}): {res.text}")
+            if res.status_code == 200:
+                return res.json().get('data')
+            return None
+        except Exception as e:
+            print(f"❌ CREATOR_INFO EXCEPTION: {e}")
+            return None
 
     def upload_video(self, video_path, caption):
         """
