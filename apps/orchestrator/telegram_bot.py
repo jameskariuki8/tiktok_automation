@@ -8,10 +8,14 @@ from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
 
 # Setup Django Environment
-# Assuming base dir is 2 levels up
+# Assuming base dir is current working directory or 2 levels up
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(BASE_DIR)
-sys.path.append(os.path.join(BASE_DIR, 'apps'))
+if BASE_DIR not in sys.path: sys.path.append(BASE_DIR)
+
+# Crucial: Add 'apps' folder to path so we can import 'accounts', 'tiktok', etc.
+APPS_DIR = os.path.join(BASE_DIR, 'apps')
+if APPS_DIR not in sys.path: sys.path.append(APPS_DIR)
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 django.setup()
 
