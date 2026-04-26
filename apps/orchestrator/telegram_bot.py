@@ -130,16 +130,20 @@ async def stop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text("No active session.")
 
 if __name__ == '__main__':
+    print("🚀 SmartTikTok Orchestrator Bot is INITIALIZING...")
     token = os.getenv('TELEGRAM_BOT_TOKEN')
     if not token:
-        print("Set TELEGRAM_BOT_TOKEN env var")
+        print("❌ CRITICAL ERROR: TELEGRAM_BOT_TOKEN is missing from environment variables!")
         sys.exit(1)
         
-    app = ApplicationBuilder().token(token).build()
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CommandHandler("pair", pair))
-    app.add_handler(CommandHandler("engage", engage))
-    app.add_handler(CommandHandler("stop", stop))
-    
-    print("🤖 SmartTikTok Orchestrator Bot started...")
-    app.run_polling()
+    try:
+        app = ApplicationBuilder().token(token).build()
+        app.add_handler(CommandHandler("start", start))
+        app.add_handler(CommandHandler("pair", pair))
+        app.add_handler(CommandHandler("engage", engage))
+        app.add_handler(CommandHandler("stop", stop))
+        
+        print("🤖 Bot status: ONLINE. Listening for commands...")
+        app.run_polling()
+    except Exception as e:
+        print(f"❌ BOT STARTUP FAILED: {e}")
