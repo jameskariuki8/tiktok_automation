@@ -363,3 +363,4 @@ yarl==1.23.0
 zstandard==0.25.0
     # via langsmith
 playwright==1.49.0
+python-telegram-bot==21.11
