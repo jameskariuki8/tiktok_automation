@@ -55,11 +55,7 @@ class ContentAIService:
         # 1. Fetch deep metrics
         all_stats = VideoAnalytics.objects.filter(account__user=self.user).order_by('-date')
         if not all_stats.exists():
-            return {
-                "summary": "Data Collection Phase",
-                "insight": "We need at least 3-5 synced posts to generate a professional roadmap. Post more videos or click 'Sync' to start.",
-                "recommendations": []
-            }
+            return "### DATA COLLECTION PHASE\nWe need at least 3-5 synced posts to generate a professional roadmap. \n\n**Action Required:** \n* Go to the Dashboard \n* Click 'Sync Engine' \n* Ensure your TikTok videos are visible in the grid."
 
         # 2. Pattern Recognition
         total_engagement = all_stats.aggregate(Sum('like_count'), Sum('comment_count'), Sum('share_count'))
