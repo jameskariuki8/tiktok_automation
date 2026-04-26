@@ -270,12 +270,9 @@ class TikTokApiService:
         
         init_data = {
             "post_info": {
-                "title": caption[:50], # Max 50 chars for title
+                "title": caption[:50],
                 "description": caption[:150],
-                "privacy_level": "SELF_ONLY", # Mandatory for Unaudited Apps
-                "allow_comment": True,
-                "allow_duet": False,
-                "allow_stitch": False
+                "privacy_level": "SELF_ONLY", # Required for unaudited
             },
             "source_info": {
                 "source": "FILE_UPLOAD",
@@ -284,13 +281,18 @@ class TikTokApiService:
                 "total_chunk_count": 1
             },
             "post_config": {
+                "allow_comment": True,
+                "allow_duet": False,
+                "allow_stitch": False,
                 "is_ad_promotion": False,
                 "brand_ad_promotion": False
-            },
-            "commercial_content_disclosure_setting": {
-                "is_self_promotion": False,
-                "is_third_party_promotion": False
             }
+        }
+        
+        # Add legacy disclosure node just in case
+        init_data["media_disclosure_info"] = {
+            "is_self_promotion": False,
+            "is_third_party_promotion": False
         }
         
         try:
