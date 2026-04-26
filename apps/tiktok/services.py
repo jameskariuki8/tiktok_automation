@@ -457,3 +457,27 @@ class TikTokApiService:
         except Exception as e:
             print(f"Error posting reply: {e}")
         return False
+
+    def post_dm_reply(self, conversation_id, text):
+        """
+        Send a direct message reply on TikTok.
+        """
+        if not self.account:
+            return False
+            
+        url = f"{self.BASE_URL}/im/message/send/"
+        headers = {
+            'Authorization': f"Bearer {self.account.access_token}",
+            'Content-Type': 'application/json'
+        }
+        data = {
+            'conversation_id': conversation_id,
+            'text': text
+        }
+        
+        try:
+            response = requests.post(url, json=data, headers=headers)
+            return response.status_code == 200
+        except Exception as e:
+            print(f"DM Send Error: {e}")
+        return False
