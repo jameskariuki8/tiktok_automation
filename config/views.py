@@ -41,3 +41,7 @@ def privacy_policy_view(request):
 
 def terms_view(request):
     return render(request, 'terms_and_conditions.html')
+
+from django.http import HttpResponse
+def tiktok_verification_view(request):
+    return HttpResponse("tiktok-developers-site-verification=cgiCTmYLcxCjsXXH7U7dJNTBrkNcK6Xz", content_type="text/plain")
