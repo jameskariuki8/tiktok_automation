@@ -9,8 +9,7 @@ urlpatterns = [
     path('content-ai/', content_ai_view, name='content-ai-ui'),
     path('privacy-policy/', privacy_policy_view, name='privacy-policy'),
     path('terms/', terms_view, name='terms'),
-    path('tiktokcgiCTmYLcxCjsXXH7U7dJNTBrkNc6Xz.txt', tiktok_verification_view),
-    path('tiktokcgiCTmYLcxCjsXXH7U7dJNTBrkNcK6Xz.txt', tiktok_verification_view),
+    path('tiktokghddr1bZgTI0uxwJFTtgzzltwr4EVAuw.txt', tiktok_verification_view),
     path('admin/', admin.site.urls),
     
     # API Endpoints

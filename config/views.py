@@ -44,4 +44,4 @@ def terms_view(request):
 
 from django.http import HttpResponse
 def tiktok_verification_view(request):
-    return HttpResponse("tiktok-developers-site-verification=cgiCTmYLcxCjsXXH7U7dJNTBrkNcK6Xz", content_type="text/plain")
+    return HttpResponse("tiktok-developers-site-verification=ghddr1bZgTI0uxwJFTtgzzltwr4EVAuw", content_type="text/plain")
