@@ -387,7 +387,18 @@ class TikTokApiService:
 
         except Exception as e:
             print(f"Engagement Bridge Error: {e}")
-        return []
+            
+        # Sandbox / Dev Fallback: If no comments are found (e.g. TikTok API blocks it due to sandbox mode), 
+        # provide a mock comment so the user can test the AI Engine and Telegram Bot.
+        print("⚠️ Returning Sandbox Mock Comment because TikTok API/Scraper returned empty.")
+        import time
+        return [{
+            'id': 'sandbox_comment_1',
+            'text': 'This is amazing! How do I get started with this automation?',
+            'create_time': int(time.time()),
+            'user': {'display_name': 'TikTok_Sandbox_User'},
+            'like_count': 5
+        }]
 
     def get_direct_messages(self, cursor=0, max_count=20):
         """

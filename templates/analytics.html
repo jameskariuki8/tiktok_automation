@@ -110,9 +110,9 @@
             container.innerHTML = videos.map(v => {
                 const desc = v.video_description || 'Untitled Post';
                 return `
-                <div onclick="selectVideo('${v.id}', '${v.view_count}', '${v.like_count}', '${v.comment_count}', \`${desc.replace(/`/g, '\\`')}\`, '${v.cover_image_url}')" 
+                <div onclick="selectVideo('${v.id || v.tiktok_video_id}', '${v.view_count}', '${v.like_count}', '${v.comment_count}', \`${desc.replace(/`/g, '\\`')}\`, '${v.cover_image_url || ''}')" 
                      class="p-3 bg-white/5 border border-white/5 rounded-xl cursor-pointer hover:border-primary/50 transition-all group flex gap-3">
-                    <img src="${v.cover_image_url}" class="w-12 h-16 rounded-md object-cover bg-dark">
+                    <img src="${v.cover_image_url || 'https://via.placeholder.com/150x200?text=No+Cover'}" class="w-12 h-16 rounded-md object-cover bg-dark">
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-medium truncate">${desc}</p>
                         <p class="text-[10px] opacity-40 mt-1">${v.view_count} views</p>
@@ -120,6 +120,13 @@
                 </div>
                 `;
             }).join('');
+
+            // Automatically select the first video so comments load immediately
+            if (videos.length > 0) {
+                const first = videos[0];
+                const desc = first.video_description || 'Untitled Post';
+                selectVideo(first.id || first.tiktok_video_id, first.view_count, first.like_count, first.comment_count, desc, first.cover_image_url || 'https://via.placeholder.com/150x200?text=No+Cover');
+            }
         } catch (e) {
             console.error('Failed to load videos', e);
         }

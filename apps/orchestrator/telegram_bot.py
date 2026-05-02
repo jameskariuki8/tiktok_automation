@@ -92,7 +92,7 @@ async def run_engagement_loop(update, user_id, duration_mins):
             videos = service.get_video_list()
             if videos:
                 vid = videos[0].get('id')
-                comments = service.get_video_comments(vid)
+                comments = service.fetch_comments(vid)
                 
                 for c in comments[:2]: # Reply to max 2 per "beat"
                     if not active_sessions.get(user_id): break
