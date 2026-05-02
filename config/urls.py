@@ -10,6 +10,7 @@ urlpatterns = [
     path('privacy-policy/', privacy_policy_view, name='privacy-policy'),
     path('terms/', terms_view, name='terms'),
     path('tiktokfLr60W3ybbaaVkRuVsdExA6bpcUuqvHj.txt', tiktok_verification_view),
+    path('tiktokfLr60W3ybbaaVkRuVsdExA6bpcUuqvHj (1).txt', tiktok_verification_view),
     path('admin/', admin.site.urls),
     
     # API Endpoints
